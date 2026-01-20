@@ -276,6 +276,9 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', 2592000))  # 30 days
     SECURE_HSTS_INCLUDE_SUBDOMAINS = os.getenv('SECURE_HSTS_INCLUDE_SUBDOMAINS', 'True').lower() in ('1', 'true', 'yes')
     SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'True').lower() in ('1', 'true', 'yes')
+else:
+    # Development: disable SSL redirect
+    SECURE_SSL_REDIRECT = False
 
 # Basic logging: ensure errors are visible in host logs (stdout/stderr)
 LOGGING = {
