@@ -1,0 +1,443 @@
+{% extends 'app/navigation.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+    <div class="sellingpage">
+        <div class="selling_container">
+            <!-- Step Indicator -->
+            <div class="selling_progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="selling_steps_horizontal">
+                    <div class="step-indicator" onclick="goToStep(1)">
+                        <div class="step-number-badge" id="badge1">
+                            <span class="badge-check">✓</span>
+                            <span class="badge-num">1</span>
+                        </div>
+                        <span class="step-title">Personal Info</span>
+                    </div>
+                    <div class="step-indicator" onclick="goToStep(2)">
+                        <div class="step-number-badge" id="badge2">
+                            <span class="badge-check">✓</span>
+                            <span class="badge-num">2</span>
+                        </div>
+                        <span class="step-title">Product Details</span>
+                    </div>
+                    <div class="step-indicator" onclick="goToStep(3)">
+                        <div class="step-number-badge" id="badge3">
+                            <span class="badge-num">3</span>
+                        </div>
+                        <span class="step-title">Review & Confirm</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="selling_form_wrapper">
+                <form id="sellForm" method="POST" enctype="multipart/form-data" action="{% url 'selling' %}">
+                    {% csrf_token %}
+
+                    <!-- STEP 1: Personal Information -->
+                    <div id="step1" class="form-step step-active">
+                        <div class="step-header">
+                            <h2>Tell Us About You</h2>
+                            <p>We'll use this information to contact you about your trade-in</p>
+                        </div>
+
+                        <div class="form-section">
+                            <h3 class="section-title">Contact Details</h3>
+                            <div class="form-grid-2col">
+                                <div class="form-group">
+                                    <label for="id_first_name">First Name <span class="required">*</span></label>
+                                    {{ form.first_name }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_last_name">Last Name <span class="required">*</span></label>
+                                    {{ form.last_name }}
+                                </div>
+                            </div>
+
+                            <div class="form-grid-2col">
+                                <div class="form-group">
+                                    <label for="id_email">Email Address <span class="required">*</span></label>
+                                    {{ form.email }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_contact">Phone Number <span class="required">*</span></label>
+                                    {{ form.contact }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_address">Street Address <span class="required">*</span></label>
+                                {{ form.address }}
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3 class="section-title">Appointment Details</h3>
+                            <div class="form-grid-2col">
+                                <div class="form-group">
+                                    <label for="id_selling_date">Preferred Date <span class="required">*</span></label>
+                                    {{ form.selling_date }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_selling_time">Preferred Time <span class="required">*</span></label>
+                                    {{ form.selling_time }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-next" onclick="nextStep(1)">
+                                Continue
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: Product Information -->
+                    <div id="step2" class="form-step">
+                        <div class="step-header">
+                            <h2>Tell Us About Your Device</h2>
+                            <p>Accurate details help us provide a better quote</p>
+                        </div>
+
+                        <div class="form-section">
+                            <h3 class="section-title">Product Details</h3>
+                            <div class="form-grid-2col">
+                                <div class="form-group">
+                                    <label for="id_product_name">Device Name <span class="required">*</span></label>
+                                    {{ form.product_name }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_category">Category <span class="required">*</span></label>
+                                    {{ form.category }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_description">Condition & Specifications <span class="required">*</span></label>
+                                {{ form.description }}
+                                <small class="help-text">Include details like condition, storage capacity, any damage, etc.</small>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3 class="section-title">Pricing & Media</h3>
+                            <div class="form-grid-2col">
+                                <div class="form-group">
+                                    <label for="id_price">Asking Price <span class="required">*</span></label>
+                                    <div class="input-prefix">
+                                        <span class="prefix-symbol">₱</span>
+                                        {{ form.price }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_image">Product Photo <span class="required">*</span></label>
+                                    <div class="file-input-wrapper" id="fileInputWrapper">
+                                        <input type="file" id="id_image" name="image" accept="image/*" style="display:none;" onchange="updateFileName()">
+                                        <span class="file-input-label" onclick="document.getElementById('id_image').click();">Choose File</span>
+                                        <span class="file-name" id="fileName"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-back" onclick="goToStep(1)">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                </svg>
+                                Back
+                            </button>
+                            <button type="button" class="btn-next" onclick="nextStep(2)">
+                                Review
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Review & Confirm -->
+                    <div id="step3" class="form-step">
+                        <div class="step-header">
+                            <h2>Review Your Submission</h2>
+                            <p>Make sure everything looks correct before submitting</p>
+                        </div>
+
+                        <div class="review-container">
+                            <div class="review-left">
+                                <div class="review-section">
+                                    <h3 class="review-title">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2z"></path>
+                                            <path d="M16 11a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"></path>
+                                        </svg>
+                                        Your Information
+                                    </h3>
+                                    <div id="summary_personal_content" class="summary-content"></div>
+                                    <a href="#" class="edit-link" onclick="goToStep(1); return false;">Edit</a>
+                                </div>
+
+                                <div class="review-section">
+                                    <h3 class="review-title">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                        </svg>
+                                        Product Details
+                                    </h3>
+                                    <div id="summary_product_content" class="summary-content"></div>
+                                    <a href="#" class="edit-link" onclick="goToStep(2); return false;">Edit</a>
+                                </div>
+                            </div>
+
+                            <div class="review-right">
+                                <div class="review-section image-section">
+                                    <h3 class="review-title">Product Photo</h3>
+                                    <div id="summary_image_container" class="image-preview-container"></div>
+                                </div>
+
+                                <div class="review-section">
+                                    <div class="form-group checkbox-group">
+                                        <label class="checkbox-label">
+                                            {{ form.agree }}
+                                            <span class="checkbox-text">I verify that the information provided is accurate and authorize the inspection of the item</span>
+                                        </label>
+                                        <div id="agree-error" class="error-message" style="display:none;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-back" onclick="goToStep(2)">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                </svg>
+                                Back
+                            </button>
+                            <button type="button" class="btn-submit" onclick="submitForm()">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                Submit Trade-In Request
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="submit-error" class="error-message" style="display:none;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 3 styles moved to `static/css/style.css` -->
+
+    <script>
+    let highestStepReached = 1;
+
+    function updateFileName() {
+        const fileInput = document.getElementById('id_image');
+        const fileName = document.getElementById('fileName');
+        const wrapper = document.getElementById('fileInputWrapper');
+        
+        if (fileInput.files && fileInput.files[0]) {
+            const file = fileInput.files[0];
+            fileName.textContent = '✓ ' + file.name;
+            fileName.style.display = 'block';
+            wrapper.classList.add('file-selected');
+        } else {
+            fileName.textContent = '';
+            fileName.style.display = 'none';
+            wrapper.classList.remove('file-selected');
+        }
+    }
+
+    function submitForm() {
+        console.log("submitForm called");
+
+        // Validate personal info (step1)
+        const step1 = document.getElementById('step1');
+        const step1Fields = step1.querySelectorAll("[required]");
+        for (const field of step1Fields) {
+            if (!field.value.trim()) {
+                alert("Please fill in all required fields in Personal Information");
+                goToStep(1);
+                return;
+            }
+        }
+
+        // Validate product info (step2)
+        const step2 = document.getElementById('step2');
+        const step2Fields = step2.querySelectorAll("[required]");
+        for (const field of step2Fields) {
+            if (!field.value.trim()) {
+                alert("Please fill in all required fields in Product Information");
+                goToStep(2);
+                return;
+            }
+        }
+
+        // Validate agree checkbox
+        const agreeCheckbox = document.querySelector('[name="agree"]');
+        const agreeError = document.getElementById('agree-error');
+        if (!agreeCheckbox || !agreeCheckbox.checked) {
+            agreeError.style.display = 'block';
+            agreeError.textContent = 'You must agree to the terms and conditions';
+            return;
+        }
+        agreeError.style.display = 'none';
+
+        // All checks passed — submit the form
+        document.getElementById('sellForm').submit();
+    }
+
+    function nextStep(current) {
+        const currentStepElement = document.getElementById(`step${current}`);
+        const errorMessages = currentStepElement.querySelectorAll(".error-message");
+        errorMessages.forEach(msg => {
+            if (msg.id !== 'agree-error' && msg.id !== 'submit-error') msg.remove();
+        });
+        
+        let isValid = true;
+        const fields = currentStepElement.querySelectorAll("[required]");
+
+        fields.forEach(field => {
+            if (!field.value.trim()) {
+                isValid = false;
+                const errorMessage = document.createElement("div");
+                errorMessage.classList.add("error-message");
+                errorMessage.textContent = `${field.placeholder || "This field"} is required`;
+                
+                // Find the form-group parent (for input-prefix or direct parent)
+                let formGroup = field.closest('.form-group');
+                if (formGroup) {
+                    formGroup.appendChild(errorMessage);
+                } else {
+                    field.parentElement.appendChild(errorMessage);
+                }
+            }
+        });
+
+        if (!isValid) return;
+
+        highestStepReached = Math.max(highestStepReached, current + 1);
+        goToStep(current + 1);
+        updateStepIndicators();
+    }
+
+    function goToStep(stepNumber) {
+        if (stepNumber > highestStepReached) {
+            return; 
+        }
+
+        document.querySelectorAll(".form-step").forEach(step => {
+            step.classList.remove("step-active");
+        });
+
+        document.getElementById(`step${stepNumber}`).classList.add("step-active");
+        
+        updateStepIndicators();
+        updateProgressBar();
+        
+        // Populate summary when navigating to step 3
+        if (stepNumber === 3) {
+            populateSummary();
+        }
+    }
+
+    function updateStepIndicators() {
+        for (let i = 1; i <= 3; i++) {
+            const badge = document.getElementById(`badge${i}`);
+            if (i < highestStepReached) {
+                badge.classList.add('completed');
+                badge.classList.remove('active');
+            } else if (i === highestStepReached) {
+                badge.classList.add('active');
+                badge.classList.remove('completed');
+            } else {
+                badge.classList.remove('active', 'completed');
+            }
+        }
+    }
+
+    function updateProgressBar() {
+        const progressFill = document.getElementById('progressFill');
+        const progress = ((highestStepReached - 1) / 2) * 100;
+        progressFill.style.width = progress + '%';
+    }
+
+    function populateSummary(){
+        // Personal Information
+        const personalFields = [
+            {name: 'first_name', label: 'First Name'},
+            {name: 'last_name', label: 'Last Name'},
+            {name: 'contact', label: 'Phone'},
+            {name: 'email', label: 'Email'},
+            {name: 'address', label: 'Address'},
+            {name: 'selling_date', label: 'Date'},
+            {name: 'selling_time', label: 'Time'}
+        ];
+        const personalContainer = document.getElementById('summary_personal_content');
+        personalContainer.innerHTML = '';
+        personalFields.forEach(field => {
+            const el = document.querySelector(`[name="${field.name}"]`);
+            if (el) {
+                const p = document.createElement('p');
+                p.innerHTML = `<strong>${field.label}:</strong> ${el.value || '-'}`;
+                personalContainer.appendChild(p);
+            }
+        });
+
+        // Product Information
+        const productFields = [
+            {name: 'product_name', label: 'Product Name'},
+            {name: 'category', label: 'Category'},
+            {name: 'price', label: 'Price'},
+            {name: 'description', label: 'Description'}
+        ];
+        const productContainer = document.getElementById('summary_product_content');
+        productContainer.innerHTML = '';
+        productFields.forEach(field => {
+            const el = document.querySelector(`[name="${field.name}"]`);
+            if (el) {
+                const p = document.createElement('p');
+                p.innerHTML = `<strong>${field.label}:</strong> ${el.value || '-'}`;
+                productContainer.appendChild(p);
+            }
+        });
+
+        // Image preview
+        const imageInput = document.querySelector('[name="image"]');
+        const imageContainer = document.getElementById('summary_image_container');
+        imageContainer.innerHTML = '';
+        if (imageInput && imageInput.files && imageInput.files[0]) {
+            const file = imageInput.files[0];
+            const img = document.createElement('img');
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '300px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '0.5rem';
+            img.alt = 'Product image preview';
+            img.src = URL.createObjectURL(file);
+            imageContainer.appendChild(img);
+        } else {
+            const noImage = document.createElement('div');
+            noImage.className = 'no-image-placeholder';
+            noImage.textContent = 'No image selected';
+            imageContainer.appendChild(noImage);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateStepIndicators();
+        updateProgressBar();
+    });
+    </script>
+
+{% endblock content %}

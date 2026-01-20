@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API</title>
+</head>
+<body>
+    <h1>Test API Endpoint</h1>
+    <button onclick="testAPI()">Test Product 20</button>
+    <div id="response" style="white-space: pre; background: #f0f0f0; padding: 10px; margin-top: 20px;"></div>
+    
+    <script>
+        function testAPI() {
+            const productId = 20;
+            const url = `/api/product/${productId}/`;
+            
+            console.log('Fetching from:', url);
+            
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => {
+                console.log('Response status:', res.status);
+                return res.json();
+            })
+            .then(data => {
+                console.log('Data received:', data);
+                document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                document.getElementById('response').innerText = 'Error: ' + err.message;
+            });
+        }
+    </script>
+</body>
+</html>

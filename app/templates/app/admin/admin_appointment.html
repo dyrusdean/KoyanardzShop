@@ -1,0 +1,163 @@
+{% extends 'app/admin/admin_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="admin_productpage">
+    <div class="product-header">
+        <h2>Appointments Management</h2>
+    </div>
+    
+    <div class="upperproduct">
+        <div class="product-filters">
+            <form method="get" class="filter-form">
+                <div class="filter-group">
+                    <select name="status" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="Pending" {% if status_filter == "Pending" %}selected{% endif %}>Pending</option>
+                        <option value="Finished" {% if status_filter == "Finished" %}selected{% endif %}>Completed</option>
+                        <option value="Cancelled" {% if status_filter == "Cancelled" %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+                <button type="submit" class="filter-btn">Filter</button>
+            </form>
+        </div>
+        
+        <div class="product-search">
+            <form action="" method="GET" class="search-form">
+                <input type="text" name="search" placeholder="Search appointments..." value="{{ search_query }}" class="search-input">
+                {% if status_filter and status_filter != '' %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+                <button type="submit" class="search-btn">🔍</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="popup" id="cancel_popup">
+        <button onclick="closeCancelPopup()" class="close-btn">✕</button>
+        <div class="pop_wrapper">
+            <div class="pop_content">
+                <h3>Cancel Appointment</h3>
+                <form id="cancel_form">
+                    {% csrf_token %}
+                    <input type="hidden" id="cancel_id" name="appointment_id">
+                    <label>Reason for cancellation:</label>
+                    <textarea id="cancel_reason" name="cancel_reason" required></textarea>
+                    <button type="submit" class="form-submit">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Appointments Table -->
+    <div class="products-table-container">
+        <div class="table-wrapper">
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Reference</th>
+                        <th>Product Name</th>
+                        <th>Customer Name</th>
+                        <th>Contact</th>
+                        <th>Date & Time</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if appointments %}
+                        {% for appointment in appointments %}
+                            {% for produkto in appointment.products.all %}
+                            <tr>
+                                <td data-label="ID">{{ appointment.id }}</td>
+                                <td data-label="Reference">{{ appointment.reference_number }}</td>
+                                <td data-label="Product Name">{{ produkto.product.product_name }}</td>
+                                <td data-label="Customer">{{ appointment.last_name }} {{ appointment.first_name }}</td>
+                                <td data-label="Contact">{{ appointment.contact }}</td>
+                                <td data-label="Date">{{ appointment.date|date:"M d, Y" }} / {{ appointment.time|time:"h:i A" }}</td>
+                                <td data-label="Quantity" class="stock-column">{{ produkto.quantity }}</td>
+                                <td data-label="Price" class="price-column">₱{{ produkto.price|intcomma }}</td>
+                                <td data-label="Status">
+                                    {% if appointment.status == "Cancelled" %}
+                                        <span class="stock-badge stock-low">Cancelled</span>
+                                    {% elif appointment.status == "Finished" %}
+                                        <span class="stock-badge stock-high">Completed</span>
+                                    {% else %}
+                                        <span class="stock-badge stock-medium">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td data-label="Actions" class="actions-column">
+                                    {% if appointment.status != "Cancelled" and appointment.status != "Finished" %}
+                                        <form method="POST" action="{% url 'finished_appointment' appointment.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                            <button type="submit" class="action-icon edit-icon" title="Complete">✓</button>
+                                        </form>
+                                        <button class="action-icon delete-icon" onclick="openCancelPopup({{ appointment.id }})" title="Cancel">✕</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="10" class="no-data">No appointments found</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openCancelPopup(id) {
+        document.getElementById('cancel_id').value = id;
+        document.getElementById('cancel_reason').value = '';
+        document.getElementById('cancel_popup').classList.add('show');
+    }
+    function closeCancelPopup() {
+        document.getElementById('cancel_popup').classList.remove('show');
+    }
+    document.getElementById('cancel_form').addEventListener('submit', function(e) {
+        e.preventDefault();
+    
+        const id = document.getElementById('cancel_id').value;
+        const reason = document.getElementById('cancel_reason').value;
+        const csrfToken = getCookie('csrftoken');
+    
+        fetch(`/admin_appointment/${id}/cancel/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ cancel_reason: reason })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('Appointment cancelled!');
+                location.reload();
+            } else {
+                alert('Error cancelling appointment.');
+            }
+        });
+    });
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+    
+{% endblock content %}

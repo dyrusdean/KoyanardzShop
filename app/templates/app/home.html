@@ -1,0 +1,224 @@
+{% extends 'app/navigation.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<section class="hp-hero">
+    <div class="container hp-hero-inner">
+        <div class="hero-copy">
+            <h1><span class="hero-highlight">POWERED</span> by <span class="hero-break">Passion</span> <span class="hero-highlights">DRIVEN</span> by <span class="hero-breaks">Performance</span></h1>
+            <p class="lead">Discover affordable and high-performance computers, laptops, and custom PC builds--handpicked to meet your needs.</p>
+            <div class="hero-ctas">
+                <a class="btn btn-primary" href="{% url 'product' %}">Shop Products</a>
+                <a class="btn btn-outline" href="{% url 'selling' %}">Sell Your Device</a>
+            </div>
+        </div>
+        <div class="hero-media">
+            <img src="{% static 'images/system1drop.png' %}" alt="Featured build" loading="lazy">
+        </div>
+    </div>
+</section>
+
+<section class="hp-products container">
+    <div class="hp-section-head">
+        <h2>Featured &amp; New Arrivals</h2>
+        <a class="see-more" href="{% url 'product' %}">See all</a>
+    </div>
+    <div class="product-carousel">
+        <div class="carousel-wrapper">
+            <div class="carousel-track">
+                {% if products %}
+                    {% for produkto in products %}
+                        <article class="carousel-slide product-card">
+                            {% if produkto.category_name.category_name == 'Others' %}
+                                <span class="product-tag tag-secondhand">2nd Hand</span>
+                            {% elif produkto.created_at %}
+                                {% now "U" as current_timestamp %}
+                                {% with created_timestamp=produkto.created_at|date:"U" %}
+                                    {% if current_timestamp|add:"-604800"|add:"0" < created_timestamp|add:"0" %}
+                                        <span class="product-tag tag-new">New</span>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                            <button type="button" class="favorite_btn {% if produkto.id|stringformat:'s' in favorites %}favorited{% endif %}" data-product-id="{{ produkto.id }}" aria-label="Toggle favorite" style="position: absolute; top: 10px; right: 10px; z-index: 20 !important; pointer-events: auto !important;">
+                                <i class="{% if produkto.id|stringformat:'s' in favorites %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                            </button>
+                            <a class="product-thumb" href="{% url 'product_item' produkto.id %}">
+                                {% if produkto.image and produkto.image.url %}
+                                    <img src="{{ produkto.image.url }}" alt="{{ produkto.product_name }}" loading="lazy">
+                                {% else %}
+                                    <img src="{% static 'images/products/placeholder.png' %}" alt="placeholder" loading="lazy">
+                                {% endif %}
+                            </a>
+                            <div class="card-body">
+                                <h3 class="card-title">{{ produkto.product_name }}</h3>
+                                {% if produkto.reviews.all %}
+                                    <div class="card-rating">
+                                        <div class="rating-stars">
+                                            {% widthratio produkto.reviews.all|length 1 1 as review_count %}
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= produkto.reviews.all|length %}
+                                                    <i class="fa-solid fa-star"></i>
+                                                {% else %}
+                                                    <i class="fa-regular fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <span class="rating-count">({{ produkto.reviews.all|length }})</span>
+                                    </div>
+                                {% else %}
+                                    <div class="card-rating">
+                                        <div class="rating-stars">
+                                            <i class="fa-regular fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                        </div>
+                                        <span class="rating-count">(0)</span>
+                                    </div>
+                                {% endif %}
+                                <div class="cardbody_bottom">
+                                    <p class="price">₱{{ produkto.price|intcomma }}</p>
+                                    <form action="{% url 'add_to_cart' produkto.id %}" method="POST" class="add-cart-form">{% csrf_token %}<button type="submit" class="add-to-cart-btn" aria-label="Add to cart"><i class="fa-solid fa-shopping-cart"></i></button></form>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                {% else %}
+                    <p>No products available right now.</p>
+                {% endif %}
+            </div>
+        </div>
+        <button class="carousel-btn prev" id="prevBtn">❮</button>
+        <button class="carousel-btn next" id="nextBtn">❯</button>
+    </div>
+</section>
+
+<section class="hp-about">
+    <div class="about-grid">
+        <div class="about-media">
+            <img src="{% static 'images/computer.png' %}" alt="Sell your device" loading="lazy">
+        </div>
+        <div class="about-left">
+            <h2>Got a laptop or PC to Sell?</h2>
+            <p>Turn your old laptop or PC into instant cash or upgrade credit.</p>
+            <a class="btn btn-primary sell-btn" href="{% url 'selling' %}">SELL NOW →</a>
+        </div>
+    </div>
+</section>
+
+<section id="store-map" class="hp-map">
+    <div class="map-grid container">
+        <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3863.9508398404387!2d120.97245137462696!3d14.429996681231737!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397d39887db6449%3A0x3926af051fdfdc8f!2sKoya%20nardz%20computer%20trading%202!5e0!3m2!1sen!2sph!4v1764759664460!5m2!1sen!2sph" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <div class="store-details">
+            <div>
+                <h3>About Koya Nardz</h3>
+                <p>Koya nardz Computer Trading is a trusted tech shop in Bacoor, Cavite, offering brand-new and secondhand laptops, desktops, and PC parts. Since 2015, we've provided reliable and budget-friendly products, helping customers find the setup that fits their needs.</p>
+            </div>
+            <h4>Visit our store</h4>
+            <p><strong>Address:</strong> 342 Molino Rd. Bacoor, Cavite</p>
+            <p><strong>Hours:</strong> Mon–Sat 9:00 — 7:00</p>
+            <p><strong>Email:</strong> <a href="mailto:koyanardzshop@gmail.com">koyanardzshop@gmail.com</a></p>
+            <p>Tap <em>Get directions</em> to open Google Maps with navigation to our area.</p>
+            <a class="btn btn-primary" href="https://www.google.com/maps/dir/?api=1&destination=Bacoor%20Cavite" target="_blank">Get directions</a>
+        </div>
+    </div>
+</section>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // Favorite button handlers are managed globally by base.js
+
+    // Carousel functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const track = document.querySelector('.carousel-track');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const wrapper = document.querySelector('.carousel-wrapper');
+        let currentPosition = 0;
+        let touchStartX = 0;
+
+        if (track && prevBtn && nextBtn && wrapper) {
+            // Function to get responsive slide width (actual card width + gap)
+            function getSlideWidth() {
+                const firstSlide = track.querySelector('.carousel-slide');
+                if (!firstSlide) return 0;
+                
+                // Get computed style for actual width + gap
+                const slideStyle = window.getComputedStyle(firstSlide);
+                const slideWidth = firstSlide.offsetWidth;
+                const trackStyle = window.getComputedStyle(track);
+                const gapWidth = parseFloat(trackStyle.gap) || 0;
+                
+                return slideWidth + gapWidth;
+            }
+
+            function getMaxScroll() {
+                return Math.max(track.scrollWidth - wrapper.offsetWidth, 0);
+            }
+
+            function scrollToPosition(newPosition) {
+                currentPosition = Math.max(0, Math.min(newPosition, getMaxScroll()));
+                track.style.transform = `translateX(-${currentPosition}px)`;
+            }
+
+            // Click navigation
+            nextBtn.addEventListener('click', function () {
+                scrollToPosition(currentPosition + getSlideWidth());
+            });
+
+            prevBtn.addEventListener('click', function () {
+                scrollToPosition(currentPosition - getSlideWidth());
+            });
+
+            // Touch/swipe functionality
+            wrapper.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX;
+            }, false);
+
+            wrapper.addEventListener('touchend', function(e) {
+                const touchEndX = e.changedTouches[0].clientX;
+                const swipeDistance = touchStartX - touchEndX;
+                const minSwipeDistance = 50; // Minimum distance to trigger swipe
+
+                if (Math.abs(swipeDistance) > minSwipeDistance) {
+                    if (swipeDistance > 0) {
+                        // Swiped left - show next
+                        scrollToPosition(currentPosition + getSlideWidth());
+                    } else {
+                        // Swiped right - show previous
+                        scrollToPosition(currentPosition - getSlideWidth());
+                    }
+                }
+            }, false);
+
+            // Handle window resize to recalculate positions
+            window.addEventListener('resize', function() {
+                // Ensure current position doesn't exceed max scroll
+                currentPosition = Math.min(currentPosition, getMaxScroll());
+                track.style.transform = `translateX(-${currentPosition}px)`;
+            });
+        }
+    });
+</script>
+
+{% endblock content %}

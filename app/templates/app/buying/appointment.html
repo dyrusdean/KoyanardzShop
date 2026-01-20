@@ -1,0 +1,708 @@
+{% extends 'app/navigation.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    /* Page Background */
+    .appointmentpage {
+        position: relative;
+        display: block;
+        margin-top: 0;
+        margin-bottom: 3rem;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+        min-height: calc(100vh - 100px);
+        padding: 30px 0;
+    }
+
+    /* Header Section */
+    .upperappointment {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        margin: 0;
+        background: white;
+        border-bottom: 2px solid #e0e0e0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .upperappointment a {
+        text-decoration: none;
+        text-transform: uppercase;
+        font-size: 0.95rem;
+        color: #38728F;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .upperappointment a:hover {
+        color: #001A40;
+        padding-left: 10px;
+    }
+
+    .upperappointment a img {
+        width: 1.2rem;
+        transform: rotate(-15deg);
+    }
+
+    .upperappointment ul {
+        display: flex;
+        align-items: center;
+        list-style: none;
+        gap: 0;
+    }
+
+    .upperappointment ul li {
+        padding: 0.5rem 1rem;
+        color: #999;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .upperappointment ul li:nth-child(3),
+    .upperappointment ul li:nth-child(5),
+    .upperappointment ul li:nth-child(7) {
+        color: #38728F;
+        font-weight: 700;
+    }
+
+    /* Body Title */
+    .appointment_body h3 {
+        padding: 2rem 2rem 1rem;
+        font-family: Montserrat;
+        font-size: 2.8rem;
+        color: #001A40;
+        text-align: center;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    /* Product Section */
+    .appointment_product_info_section {
+        max-width: 1400px;
+        margin: 0 auto 35px;
+        padding: 0 2rem;
+        box-sizing: border-box;
+    }
+
+    .appointment_product_card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 2px solid #e0e0e0;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 4px 12px rgba(56, 114, 143, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .appointment_product_card:hover {
+        box-shadow: 0 8px 24px rgba(56, 114, 143, 0.15);
+        border-color: #38728F;
+        transform: translateY(-2px);
+    }
+
+    .appointment_product_header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 22px;
+        padding-bottom: 16px;
+        border-bottom: 3px solid #38728F;
+    }
+
+    .appointment_product_header h4 {
+        margin: 0;
+        font-size: 1.4rem;
+        color: #001A40;
+        font-family: Montserrat;
+        font-weight: 700;
+    }
+
+    .appointment_product_content {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 35px;
+        align-items: start;
+    }
+
+    .appointment_product_image {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        background: #f0f0f0;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 3px solid #e0e0e0;
+        flex-shrink: 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .appointment_product_image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .appointment_product_details {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+
+    .appointment_product_detail_item {
+        background: white;
+        padding: 16px;
+        border-radius: 10px;
+        border-left: 5px solid #38728F;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .appointment_product_detail_item:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(56, 114, 143, 0.1);
+    }
+
+    .appointment_product_detail_item strong {
+        display: block;
+        color: #666;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+
+    .appointment_product_detail_item span {
+        display: block;
+        color: #001A40;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .appointment_product_detail_item.total {
+        border-left-color: #2a5276;
+        background: linear-gradient(135deg, #f0f8ff 0%, #ffffff 100%);
+    }
+
+    .appointment_product_detail_item.total strong {
+        color: #38728F;
+    }
+
+    .appointment_product_detail_item.total span {
+        font-size: 1.5rem;
+        color: #38728F;
+        font-weight: 700;
+    }
+
+    /* Main Content Area */
+    .appointment_bodybody {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1.3fr;
+        width: 100%;
+        padding: 0 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        box-sizing: border-box;
+        gap: 150px;
+        align-items: start;
+    }
+
+    /* Calendar Section */
+    .appointment_body .appointment_left {
+        width: 100%;
+        font-family: Montserrat;
+        background: white;
+        padding: 28px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .appointment_body .appointment_left p {
+        padding: 0;
+        font-size: 1.3rem;
+        color: #001A40;
+        font-weight: 700;
+        margin-bottom: 0;
+        margin-top: 0;
+    }
+
+    #appointment-calendar {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        margin: 0;
+        cursor: pointer;
+        flex: 1;
+    }
+
+    #appointment-calendar table thead {
+        background-color: #38728F;
+        color: white;
+    }
+
+    #appointment-calendar table thead th {
+        padding: 12px;
+        font-weight: 600;
+    }
+
+    #appointment-calendar table thead th {
+        padding: 8px 4px;
+        font-size: 0.9rem;
+    }
+
+    #appointment-calendar table tbody td {
+        padding: 6px 3px;
+        border: 1px solid #e0e0e0;
+        text-align: center;
+        font-size: 0.85rem;
+    }
+
+    #appointment-calendar table tbody td:hover {
+        background-color: #e8f4f8;
+    }
+
+    /* Form Section */
+    .appointment_body .appointment_right {
+        display: block;
+        text-align: left;
+        width: 100%;
+        max-width: 100%;
+        overflow: visible;
+        background: white;
+        padding: 28px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .appointment_body .appointment_right p {
+        padding: 0;
+        font-size: 1.3rem;
+        color: #001A40;
+        font-weight: 700;
+        margin-bottom: 22px;
+    }
+
+    .appointment_body .appointment_right img {
+        width: 1.8rem;
+        height: auto;
+        margin-right: 12px;
+        vertical-align: middle;
+        opacity: 0.8;
+    }
+
+    .appointment_body .appointment_right i {
+        width: 1.8rem;
+        height: auto;
+        margin-right: 12px;
+        vertical-align: middle;
+        opacity: 0.8;
+        font-size: 1.5rem;
+        color: #38728F;
+    }
+
+    /* Form Input Styling */
+    .apppointment_rightform {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        width: 100%;
+    }
+
+    .apppointment_rightform i {
+        flex-shrink: 0;
+        font-size: 1.5rem;
+        color: #38728F;
+    }
+
+    .apppointment_rightform img {
+        flex-shrink: 0;
+    }
+
+    .apppointment_rightform p {
+        margin: 0;
+        flex: 1;
+    }
+
+    .apppointment_rightform p input {
+        width: 100% !important;
+    }
+
+    .appointment_body .appointment_right form p input {
+        width: 100%;
+        max-width: 100%;
+        height: 44px;
+        padding: 10px 14px;
+        margin: 0;
+        font-size: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        box-sizing: border-box;
+        font-family: Montserrat;
+        transition: all 0.3s ease;
+        display: block;
+    }
+
+    .appointment_body .appointment_right form p input:focus {
+        border-color: #38728F;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(56, 114, 143, 0.1);
+        outline: none;
+    }
+
+    /* Time Selector - Simple Select */
+    #id_time_select {
+        transition: all 0.3s ease;
+    }
+
+    #id_time_select:focus {
+        border-color: #38728F !important;
+        background-color: white !important;
+        box-shadow: 0 0 0 3px rgba(56, 114, 143, 0.1) !important;
+        outline: none !important;
+    }
+
+    #id_time_select:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .timedropdown-button {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+    }
+
+    /* Submit Button */
+    .apppointmentright_formbutton {
+        width: 100%;
+        max-width: 100%;
+        margin: 24px 0 0 0;
+        padding: 14px 28px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        background: linear-gradient(135deg, #38728F 0%, #2a5276 100%);
+        cursor: pointer;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .apppointmentright_formbutton:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(56, 114, 143, 0.3);
+    }
+
+    .apppointmentright_formbutton:active {
+        transform: translateY(0);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .appointment_bodybody {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .appointment_product_content {
+            grid-template-columns: 1fr;
+        }
+
+        .appointment_product_image {
+            margin: 0 auto;
+        }
+
+        .appointment_product_details {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .appointmentpage {
+            padding: 15px 0;
+        }
+
+        .appointment_body h3 {
+            font-size: 2rem;
+            padding: 1.5rem 1rem 0.5rem;
+        }
+
+        .appointment_product_info_section {
+            padding: 0 1rem;
+            margin-bottom: 25px;
+        }
+
+        .appointment_product_card {
+            padding: 18px;
+        }
+
+        .appointment_bodybody {
+            padding: 0 1rem;
+            gap: 20px;
+        }
+
+        .appointment_body .appointment_left,
+        .appointment_body .appointment_right {
+            padding: 18px;
+        }
+
+        .upperappointment {
+            padding: 0.8rem 1rem;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .upperappointment ul {
+            width: 100%;
+            overflow-x: auto;
+            justify-content: flex-start;
+        }
+
+        .appointment_body .appointment_right form p input {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .appointment_body h3 {
+            font-size: 1.5rem;
+        }
+
+        .appointment_product_content {
+            gap: 15px;
+        }
+
+        .appointment_product_image {
+            width: 120px;
+            height: 120px;
+        }
+
+        .appointment_product_details {
+            gap: 12px;
+        }
+
+        .time-dropdown.active .options {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+<div class="appointmentpage">
+    <div class="upperappointment">
+        <a href="{% url 'cart' %}"><img src="{% static 'images/icon/black-back.png' %}" alt=""> Back to Cart</a>
+        <ul>
+            <li>Cart</li>
+            <p>></p>
+            <li>Appointment</li>
+            <p>></p>
+            <li>Checkout</li>
+            <p>></p>
+            <li>Complete</li>
+        </ul>
+    </div>
+    <div class="appointment_body">
+        <h3>Make an Appointment</h3>
+        
+        {% if product_info %}
+        <div class="appointment_product_info_section">
+            <div class="appointment_product_card">
+                <div class="appointment_product_header">
+                    <h4>📦 Product Details</h4>
+                </div>
+                <div class="appointment_product_content">
+                    {% if product_info.image %}
+                    <div class="appointment_product_image">
+                        <img src="{{ product_info.image }}" alt="{{ product_info.product_name }}">
+                    </div>
+                    {% endif %}
+                    <div class="appointment_product_details">
+                        <div class="appointment_product_detail_item">
+                            <strong>Product Name</strong>
+                            <span>{{ product_info.product_name }}</span>
+                        </div>
+                        <div class="appointment_product_detail_item">
+                            <strong>Unit Price</strong>
+                            <span>₱{{ product_info.price|floatformat:2 }}</span>
+                        </div>
+                        <div class="appointment_product_detail_item">
+                            <strong>Quantity</strong>
+                            <span>{{ product_info.quantity }}</span>
+                        </div>
+                        <div class="appointment_product_detail_item total">
+                            <strong>Total Amount</strong>
+                            <span>₱{{ product_info.total_price|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="appointment_bodybody">
+            <div class="appointment_left">
+                <p>Select Date:</p>
+                <div id="appointment-calendar">
+
+                </div>
+            </div>
+            <div class="appointment_right">
+                <p><i class="fas fa-user"></i> Your Information</p>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="apppointment_rightform">
+                        <i class="fas fa-user-circle"></i><p>{{ form.first_name }}</p>
+                        <p>{{ form.last_name }}</p>
+                    </div>
+                    <div class="apppointment_rightform">
+                    <i class="fas fa-phone"></i><p>{{ form.contact }}</p>
+                    </div>
+                    <div class="apppointment_rightform">
+                    <i class="fas fa-envelope"></i><p>{{ form.email }}</p>
+                    </div>
+
+                    {{ form.date.as_hidden }}
+                    {{ form.time.as_hidden }}
+
+                    <div class="apppointment_rightform">
+                        <i class="fas fa-clock"></i>
+                        <select id="id_time_select" disabled style="flex: 1; height: 44px; padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 8px; background-color: #f8f9fa; font-size: 1rem; font-family: Montserrat; cursor: pointer; transition: all 0.3s ease;">
+                            <option value="">Select Time</option>
+                        </select>
+                    </div>
+
+                    <button class="apppointmentright_formbutton" type="submit">Proceed to Checkout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Helper function to format time
+    function formatTime(t) {
+        let [h, m] = t.split(":");
+        h = parseInt(h);
+        const am = h >= 12 ? "PM" : "AM";
+        h = h > 12 ? h - 12 : h;
+        if (h === 0) h = 12;
+        return `${h}:${m} ${am}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get DOM elements
+        const timeSelect = document.getElementById("id_time_select");
+        const hiddenTime = document.getElementById("id_time");
+        
+        // Handle time selection
+        timeSelect.addEventListener("change", function() {
+            hiddenTime.value = this.value;
+        });
+
+        // Initialize calendar
+        const calendarEl = document.getElementById('appointment-calendar');
+
+        fetch('/get-booked-dates/')
+            .then(res => res.json())
+            .then(data => {
+                const blocked = data.blocked_dates;
+
+                const calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    validRange: { 
+                        start: new Date().toISOString().split("T")[0] 
+                    },  
+                    dateClick(info) {
+                        if (info.date.getDay() === 0) {
+                            alert("Sorry, Sunday is not available.");
+                            return;
+                        }
+                        if (blocked.includes(info.dateStr)) {
+                            alert("This date is fully booked.");
+                            return;
+                        }
+
+                        calendar.getEvents().forEach(e => e.remove());
+                        calendar.addEvent({
+                            start: info.dateStr,
+                            display: 'background',
+                            color: '#38728F'
+                        });
+
+                        loadTimes(info.dateStr);
+                    },
+                    dayCellDidMount(info) {
+                        if (info.date.getDay() === 0) {
+                            info.el.style.background = "#eee";
+                            info.el.style.color = "#999";
+                        }
+                        if (blocked.includes(info.date.toISOString().split("T")[0])) {
+                            info.el.style.background = "#ffcdd2";
+                        }
+                    }
+                });
+                calendar.render();
+            });
+    });
+
+    // Load available times for selected date
+    function loadTimes(date) {
+        const timeSelect = document.getElementById("id_time_select");
+        const hiddenDate = document.getElementById("id_date");
+        
+        hiddenDate.value = date;
+
+        fetch(`/get-available-times/?date=${date}`)
+            .then(res => res.json())
+            .then(data => {
+                const available = data.available_times;
+                
+                // Clear existing options
+                timeSelect.innerHTML = '<option value="">Select Time</option>';
+                
+                // Enable the select
+                timeSelect.disabled = false;
+
+                if (available.length === 0) {
+                    timeSelect.innerHTML = '<option value="">No available times</option>';
+                    timeSelect.disabled = true;
+                    return;
+                }
+
+                // Add available times to select
+                available.forEach(t => {
+                    const option = document.createElement("option");
+                    option.value = t;
+                    option.textContent = formatTime(t);
+                    timeSelect.appendChild(option);
+                });
+                
+                // Set first option as selected
+                if (available.length > 0) {
+                    timeSelect.value = available[0];
+                    document.getElementById("id_time").value = available[0];
+                }
+            })
+            .catch(err => {
+                console.error("Error loading times:", err);
+                timeSelect.innerHTML = '<option value="">Error loading times</option>';
+                timeSelect.disabled = true;
+            });
+    }
+</script>
+{% endblock content %}

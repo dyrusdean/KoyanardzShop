@@ -1,0 +1,2752 @@
+{% extends 'app/navigation.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html .product_itempage,
+    .product_itempage {
+        background: #f8f9fa !important;
+        min-height: 100vh !important;
+        padding: 40px 20px !important;
+        display: block !important;
+    }
+
+    html .product_itempage > div,
+    .product_itempage > div {
+        max-width: 1400px !important;
+        margin: 0 auto !important;
+    }
+
+    html .product-hero,
+    .product-hero {
+        max-width: 1400px !important;
+        margin: 0 auto !important;
+        background: white !important;
+        border-radius: 16px !important;
+        overflow: hidden !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+        margin-bottom: 60px !important;
+        display: grid !important;
+    }
+
+    html .hero-container,
+    .hero-container {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 50px !important;
+        padding: 50px !important;
+        align-items: start !important;
+    }
+
+    html .product-images,
+    .product-images {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+        position: relative !important;
+    }
+
+    html .image-canvas-container,
+    .image-canvas-container {
+        position: relative !important;
+        width: 100% !important;
+        aspect-ratio: 1 !important;
+    }
+
+    html .canvas-3d-wrapper,
+    .canvas-3d-wrapper {
+        background: #f0f0f0 !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        aspect-ratio: 1 !important;
+        display: none !important;
+        align-items: center !important;
+        justify-content: center !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    html .canvas-3d-wrapper.active,
+    .canvas-3d-wrapper.active {
+        display: flex !important;
+    }
+
+    html .main-image-wrapper.hidden,
+    .main-image-wrapper.hidden {
+        display: none !important;
+    }
+
+    html .main-image-wrapper,
+    .main-image-wrapper {
+        background: #f0f0f0 !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        aspect-ratio: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        position: relative !important;
+    }
+
+    html #main_image,
+    #main_image {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+        padding: 20px !important;
+        transition: transform 0.3s ease !important;
+    }
+
+    html #main_image:hover,
+    #main_image:hover {
+        transform: scale(1.05) !important;
+    }
+
+    html #model-3d-canvas,
+    #model-3d-canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        background-color: #f0f0f0 !important;
+        cursor: grab !important;
+    }
+
+    html #main_image.hidden-image,
+    #main_image.hidden-image {
+        display: none !important;
+        visibility: hidden !important;
+        z-index: -100 !important;
+    }
+
+    html .view-3d-button,
+    .view-3d-button {
+        margin-top: 10px !important;
+        padding: 10px 16px !important;
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        cursor: pointer !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        width: 100% !important;
+    }
+
+    html .view-3d-button:hover,
+    .view-3d-button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 16px rgba(118, 75, 162, 0.3) !important;
+    }
+
+    html .view-3d-button.active,
+    .view-3d-button.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+
+    html .thumbnail-container,
+    .thumbnail-container {
+        display: flex !important;
+        gap: 10px !important;
+        overflow-x: auto !important;
+        padding-bottom: 5px !important;
+    }
+
+    html .thumbnail,
+    .thumbnail {
+        width: 80px !important;
+        height: 80px !important;
+        border-radius: 8px !important;
+        cursor: pointer !important;
+        object-fit: cover !important;
+        border: 2px solid #e0e0e0 !important;
+        transition: all 0.3s ease !important;
+        flex-shrink: 0 !important;
+    }
+
+    html .thumbnail:hover,
+    .thumbnail:hover,
+    html .thumbnail.active-thumb,
+    .thumbnail.active-thumb {
+        border-color: #667eea !important;
+        transform: scale(1.05) !important;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+    }
+
+    html .product-info,
+    .product-info {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 25px !important;
+    }
+
+    html .product-header,
+    .product-header {
+        border-bottom: 2px solid #f0f0f0 !important;
+        padding-bottom: 20px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    html .product-header h1,
+    .product-header h1 {
+        font-size: 32px !important;
+        color: #1a1a1a !important;
+        margin-bottom: 0 !important;
+        font-weight: 700 !important;
+        line-height: 1.2 !important;
+    }
+
+    html .rating-section,
+    .rating-section {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        font-size: 14px !important;
+    }
+
+    html .rating-stars,
+    .rating-stars {
+        color: #ffc107 !important;
+        font-size: 18px !important;
+        letter-spacing: 2px !important;
+    }
+
+    html .rating-text,
+    .rating-text {
+        color: #666 !important;
+    }
+
+    html .product-badge,
+    .product-badge {
+        display: inline-block !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        padding: 6px 14px !important;
+        border-radius: 20px !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        margin-top: 10px !important;
+    }
+
+    html .product-description,
+    .product-description {
+        color: #555 !important;
+        line-height: 1.8 !important;
+        font-size: 15px !important;
+        white-space: pre-wrap !important;
+        word-wrap: break-word !important;
+    }
+
+    html .price-section,
+    .price-section {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+        padding: 25px !important;
+        border-radius: 12px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+
+    html .price-text,
+    .price-text {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 5px !important;
+    }
+
+    html .price-label,
+    .price-label {
+        font-size: 13px !important;
+        color: #999 !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+    }
+
+    html .price-value,
+    .price-value {
+        font-size: 36px !important;
+        font-weight: 700 !important;
+        color: #667eea !important;
+    }
+
+    html .stock-text,
+    .stock-text {
+        font-size: 14px !important;
+        color: #28a745 !important;
+        font-weight: 600 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+
+    html .stock-text::before,
+    .stock-text::before {
+        content: '✓' !important;
+        font-size: 18px !important;
+    }
+
+    html .variants-section,
+    .variants-section {
+        padding: 20px !important;
+        background: #f9f9f9 !important;
+        border-radius: 12px !important;
+    }
+
+    html .variants-section h4,
+    .variants-section h4 {
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        color: #333 !important;
+        margin-bottom: 12px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
+
+    html .variant-list,
+    .variant-list {
+        display: flex !important;
+        gap: 10px !important;
+        flex-wrap: wrap !important;
+    }
+
+    html .variant_btn,
+    .variant_btn {
+        padding: 8px 16px !important;
+        background: white !important;
+        border: 2px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+        cursor: pointer !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        text-decoration: none !important;
+        color: #333 !important;
+    }
+
+    html .variant_btn:hover,
+    .variant_btn:hover {
+        border-color: #667eea !important;
+        background: #f0f4ff !important;
+        color: #667eea !important;
+    }
+
+    html .action-buttons,
+    .action-buttons {
+        display: flex !important;
+        gap: 12px !important;
+        max-width: 400px !important;
+    }
+
+    html .action-buttons button,
+    .action-buttons button,
+    html .action-buttons form button,
+    .action-buttons form button {
+        flex: 1 !important;
+        padding: 14px 24px !important;
+        border: none !important;
+        border-radius: 10px !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+    }
+
+    html .action-buttons form:first-child button,
+    .action-buttons form:first-child button {
+        background: #0b7aa3 !important;
+        color: white !important;
+    }
+
+    html .action-buttons form:first-child button:hover,
+    .action-buttons form:first-child button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4) !important;
+    }
+
+    html .action-buttons form:last-child button,
+    .action-buttons form:last-child button {
+        background: white !important;
+        color: #667eea !important;
+        border: 2px solid #667eea !important;
+    }
+
+    html .action-buttons form:last-child button:hover,
+    .action-buttons form:last-child button:hover {
+        background: #667eea !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+    }
+
+    html .favorite_btn,
+    .favorite_btn {
+        width: auto !important;
+        height: auto !important;
+        min-width: auto !important;
+        padding: 14px 24px !important;
+        border-radius: 10px !important;
+        background: white !important;
+        border: 1.5px solid #e0e0e0 !important;
+        cursor: pointer !important;
+        font-size: 18px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+        z-index: 10 !important;
+        padding: 0 !important;
+        position: relative !important;
+    }
+
+    html .favorite_btn:hover,
+    .favorite_btn:hover {
+        transform: scale(1.1) !important;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    html .favorite_btn.favorited,
+    .favorite_btn.favorited {
+        color: #e74c3c !important;
+    }
+
+    html .back-button,
+    .back-button {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        color: #667eea !important;
+        text-decoration: none !important;
+        font-weight: 600 !important;
+        margin-bottom: 20px !important;
+        transition: all 0.3s ease !important;
+    }
+
+    html .back-button:hover,
+    .back-button:hover {
+        gap: 12px !important;
+    }
+
+    html .content-section,
+    .content-section {
+        max-width: 1400px !important;
+        margin: 0 auto !important;
+    }
+
+    html .reviews-section,
+    .reviews-section,
+    html .suggestions-section,
+    .suggestions-section {
+        background: white !important;
+        border-radius: 16px !important;
+        padding: 40px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+        margin-bottom: 40px !important;
+    }
+
+    html .section-title,
+    .section-title {
+        font-size: 24px !important;
+        font-weight: 700 !important;
+        color: #1a1a1a !important;
+        margin-bottom: 30px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+    }
+
+    html .ratings-container,
+    .ratings-container {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 40px !important;
+        margin-bottom: 40px !important;
+    }
+
+    html .rating-display,
+    .rating-display {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+
+    html .rating-large,
+    .rating-large {
+        font-size: 36px !important;
+        color: #ffc107 !important;
+        margin-bottom: 8px !important;
+    }
+
+    html .rating-info,
+    .rating-info {
+        font-size: 12px !important;
+        color: #666 !important;
+    }
+
+    html .stars,
+    .stars {
+        display: flex !important;
+        gap: 6px !important;
+        font-size: 20px !important;
+        cursor: pointer !important;
+    }
+
+    html .stars span,
+    .stars span {
+        color: #e0e0e0 !important;
+        transition: all 0.2s ease !important;
+        text-shadow: none !important;
+    }
+
+    html .stars span:hover,
+    .stars span:hover,
+    html .stars span.selected,
+    .stars span.selected {
+        text-shadow: 0 0 8px rgba(255, 193, 7, 0.5) !important;
+    }
+
+    html .comments-section,
+    .comments-section {
+        border-top: 2px solid #f0f0f0 !important;
+        padding-top: 30px !important;
+    }
+
+    html .comment-form,
+    .comment-form {
+        background: #f9f9f9 !important;
+        padding: 20px !important;
+        border-radius: 10px !important;
+        margin-bottom: 25px !important;
+    }
+
+    html .comment-form textarea,
+    .comment-form textarea {
+        width: 100% !important;
+        padding: 10px !important;
+        border: 2px solid #e0e0e0 !important;
+        border-radius: 6px !important;
+        font-size: 13px !important;
+        font-family: inherit !important;
+        resize: vertical !important;
+        min-height: 80px !important;
+        transition: border-color 0.3s ease !important;
+    }
+
+    html .comment-form textarea:focus,
+    .comment-form textarea:focus {
+        outline: none !important;
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    }
+
+    html .comment-form button,
+    .comment-form button {
+        background: #0b7aa3 !important;
+        color: white !important;
+        border: none !important;
+        padding: 10px 20px !important;
+        border-radius: 8px !important;
+        cursor: pointer !important;
+        font-weight: 600 !important;
+        margin-top: 10px !important;
+        transition: all 0.3s ease !important;
+    }
+
+    html .comment-form button:hover,
+    .comment-form button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+    }
+
+    html .review-item,
+    .review-item {
+        background: #f9f9f9 !important;
+        padding: 15px !important;
+        border-radius: 8px !important;
+        margin-bottom: 12px !important;
+        border-left: 3px solid #667eea !important;
+    }
+
+    html .review-header,
+    .review-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin-bottom: 10px !important;
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+    }
+
+    html .review-username,
+    .review-username {
+        font-weight: 600 !important;
+        color: #333 !important;
+        font-size: 13px !important;
+    }
+
+    html .review-date,
+    .review-date {
+        font-size: 11px !important;
+        color: #999 !important;
+    }
+
+    html .review-rating,
+    .review-rating {
+        color: #ffc107 !important;
+        font-size: 12px !important;
+        margin-bottom: 8px !important;
+    }
+
+    html .review-comment,
+    .review-comment {
+        color: #555 !important;
+        line-height: 1.5 !important;
+        font-size: 12px !important;
+    }
+
+    html .product-cards,
+    .product-cards {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+        gap: 1rem !important;
+    }
+
+    html .product-card,
+    .product-card {
+        background: #fff !important;
+        border-radius: 10px !important;
+        overflow: hidden !important;
+        border: 1px solid #eef6fb !important;
+        display: flex !important;
+        flex-direction: column !important;
+        position: relative !important;
+        pointer-events: auto !important;
+    }
+
+    html .product-card:hover,
+    .product-card:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    html .product-card img,
+    .product-card img {
+        width: 100% !important;
+        height: 220px !important;
+        object-fit: cover !important;
+        display: block !important;
+        padding: 0 !important;
+        transition: transform .35s ease !important;
+    }
+
+    html .product-card:hover img,
+    .product-card:hover img {
+        transform: scale(1.03) !important;
+    }
+
+    html .product-name,
+    .product-name {
+        padding: 0.9rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: .6rem !important;
+        flex-grow: 1 !important;
+        width: 100% !important;
+    }
+
+    html .product-card h4,
+    .product-card h4 {
+        font-size: 1rem !important;
+        margin: 0 !important;
+        color: #1B1A1A !important;
+        line-height: 1.2 !important;
+    }
+
+    html .product-card p,
+    .product-card p {
+        font-size: 0.85rem !important;
+        font-weight: 800 !important;
+        color: #0b84c6 !important;
+        margin-bottom: .3rem !important;
+    }
+
+    html .product-card button,
+    .product-card button {
+        width: 100% !important;
+        padding: .55rem .8rem !important;
+        text-transform: uppercase !important;
+        border-radius: .5rem !important;
+        background: #033f63 !important;
+        color: #fff !important;
+        border: 0 !important;
+        font-weight: 700 !important;
+        cursor: pointer !important;
+        margin: 0 !important;
+    }
+
+    html .product-name form,
+    .product-name form {
+        width: 100% !important;
+    }
+
+    html .product-card button:hover,
+    .product-card button:hover {
+        background: #022f4a !important;
+    }
+
+    html .product-tag,
+    .product-tag {
+        position: absolute !important;
+        top: 10px !important;
+        left: 10px !important;
+        padding: 6px 12px !important;
+        border-radius: 20px !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        color: white !important;
+    }
+
+    html .tag-new,
+    .tag-new {
+        background: #28a745 !important;
+    }
+
+    html .tag-secondhand,
+    .tag-secondhand {
+        background: #ff6b6b !important;
+    }
+
+    html .product-card .favorite_btn,
+    .product-card .favorite_btn {
+        position: absolute !important;
+        top: 12px !important;
+        right: 12px !important;
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: linear-gradient(135deg, #fff 0%, #f6fbff 60%) !important;
+        border: 1px solid rgba(11, 132, 198, 0.08) !important;
+        box-shadow: 0 8px 20px rgba(2, 24, 40, 0.06) !important;
+        cursor: pointer !important;
+        transition: transform .18s ease, box-shadow .18s !important;
+        padding: 0 !important;
+        z-index: 10 !important;
+    }
+
+    html .product-card .favorite_btn i,
+    .product-card .favorite_btn i {
+        color: #777 !important;
+        font-size: 1rem !important;
+        transition: color .15s ease, transform .15s !important;
+    }
+
+    html .product-card .favorite_btn:hover,
+    .product-card .favorite_btn:hover {
+        transform: translateY(-4px) !important;
+        box-shadow: 0 14px 34px rgba(2, 24, 40, 0.12) !important;
+    }
+
+    html .product-card .favorite_btn.favorited,
+    .product-card .favorite_btn.favorited {
+        background: linear-gradient(135deg, #ffe9ef, #ffd6e1) !important;
+        border-color: rgba(224, 36, 94, 0.12) !important;
+    }
+
+    html .product-card .favorite_btn.favorited i,
+    .product-card .favorite_btn.favorited i {
+        color: #e0245e !important;
+        transform: scale(1.06) !important;
+    }
+
+    @media (max-width: 1024px) {
+        html .product_itempage,
+        .product_itempage {
+            padding: 30px 15px !important;
+        }
+
+        .hero-container {
+            gap: 40px !important;
+            padding: 35px !important;
+        }
+
+        .product-header h1 {
+            font-size: 28px !important;
+        }
+
+        .price-value {
+            font-size: 32px !important;
+        }
+
+        .action-buttons {
+            max-width: 100% !important;
+        }
+
+        .product-cards {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 18px !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        html .product_itempage,
+        .product_itempage {
+            padding: 20px 10px !important;
+        }
+
+        html .product-hero,
+        .product-hero {
+            margin-bottom: 40px !important;
+        }
+
+        .hero-container {
+            display: flex !important;
+            flex-direction: column !important;
+            grid-template-columns: 1fr !important;
+            gap: 25px !important;
+            padding: 20px !important;
+            width: 100% !important;
+            align-items: stretch !important;
+        }
+
+        .product-images {
+            gap: 12px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+            flex-basis: auto !important;
+        }
+
+        .main-image-wrapper {
+            aspect-ratio: 1 !important;
+        }
+
+        #main_image {
+            padding: 15px !important;
+        }
+
+        .thumbnail-container {
+            gap: 8px !important;
+        }
+
+        .thumbnail {
+            width: 70px !important;
+            height: 70px !important;
+        }
+
+        .product-info {
+            gap: 20px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+            flex-basis: auto !important;
+        }
+
+        .product-cards {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 12px !important;
+        }
+
+        .product-card {
+            border-radius: 10px !important;
+        }
+
+        .product-card img {
+            height: 160px !important;
+        }
+
+        .product-name {
+            padding: 12px !important;
+        }
+
+        .product-header {
+            padding-bottom: 15px !important;
+        }
+
+        .product-header h1 {
+            font-size: 22px !important;
+            margin-bottom: 10px !important;
+        }
+
+        .rating-section {
+            font-size: 13px !important;
+        }
+
+        .product-badge {
+            margin-top: 8px !important;
+            padding: 5px 12px !important;
+            font-size: 11px !important;
+        }
+
+        .product-description {
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+        }
+
+        .price-section {
+            padding: 20px !important;
+            flex-direction: column !important;
+            gap: 15px !important;
+        }
+
+        .price-value {
+            font-size: 28px !important;
+        }
+
+        .stock-text {
+            font-size: 12px !important;
+        }
+
+        .variants-section {
+            padding: 15px !important;
+        }
+
+        .variants-section h4 {
+            font-size: 12px !important;
+            margin-bottom: 10px !important;
+        }
+
+        .variant-list {
+            gap: 8px !important;
+        }
+
+        .variant_btn {
+            padding: 6px 12px !important;
+            font-size: 12px !important;
+        }
+
+        .action-buttons {
+            flex-direction: column !important;
+            max-width: 100% !important;
+            gap: 10px !important;
+        }
+
+        .action-buttons button,
+        .action-buttons form button {
+            padding: 12px 20px !important;
+            font-size: 14px !important;
+        }
+
+        .favorite_btn {
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 15px !important;
+        }
+
+        .back-button {
+            font-size: 14px !important;
+            margin-bottom: 15px !important;
+        }
+
+        html .reviews-section,
+        .reviews-section,
+        html .suggestions-section,
+        .suggestions-section {
+            padding: 25px !important;
+            margin-bottom: 30px !important;
+        }
+
+        .section-title {
+            font-size: 20px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .ratings-container {
+            grid-template-columns: 1fr !important;
+            gap: 30px !important;
+            margin-bottom: 30px !important;
+        }
+
+        .rating-display {
+            padding: 15px !important;
+            background: #f9f9f9 !important;
+            border-radius: 10px !important;
+        }
+
+        .rating-large {
+            font-size: 40px !important;
+        }
+
+        .rating-info {
+            font-size: 13px !important;
+        }
+
+        .stars {
+            font-size: 24px !important;
+            gap: 6px !important;
+        }
+
+        .comments-section {
+            border-top: 2px solid #f0f0f0 !important;
+            padding-top: 20px !important;
+        }
+
+        .comments-section h3 {
+            font-size: 18px !important;
+            font-weight: 600 !important;
+            margin-bottom: 20px !important;
+            color: #333 !important;
+        }
+
+        .comment-form {
+            padding: 15px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .comment-form textarea {
+            font-size: 13px !important;
+            min-height: 80px !important;
+        }
+
+        .comment-form button {
+            padding: 8px 16px !important;
+            font-size: 13px !important;
+        }
+
+        .review-item {
+            padding: 15px !important;
+            margin-bottom: 12px !important;
+        }
+
+        .review-header {
+            margin-bottom: 8px !important;
+        }
+
+        .review-username {
+            font-size: 13px !important;
+        }
+
+        .review-date {
+            font-size: 12px !important;
+        }
+
+        .review-rating {
+            font-size: 13px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .review-comment {
+            font-size: 13px !important;
+        }
+
+        .product-cards {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+            gap: 20px !important;
+        }
+
+        .product-card {
+            border-radius: 10px !important;
+        }
+
+        .product-card-image {
+            height: 160px !important;
+        }
+
+        .product-card-image img {
+            padding: 12px !important;
+        }
+
+        .product-card-content {
+            padding: 15px !important;
+        }
+
+        .product-card h4 {
+            font-size: 13px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .product-card p {
+            font-size: 16px !important;
+            margin-bottom: 12px !important;
+        }
+
+        .product-card button {
+            padding: 10px !important;
+            font-size: 13px !important;
+        }
+
+        div[style*="padding: 0 20px 20px 20px"] {
+            padding: 0 15px 15px 15px !important;
+        }
+
+        div[style*="padding: 0 20px 20px 20px"] button {
+            padding: 10px !important;
+            font-size: 13px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        html .product_itempage,
+        .product_itempage {
+            padding: 10px 4px !important;
+        }
+
+        html .product-hero,
+        .product-hero {
+            border-radius: 10px !important;
+            margin-bottom: 15px !important;
+            display: block !important;
+        }
+
+        html .hero-container,
+        .hero-container {
+            display: flex !important;
+            flex-direction: column !important;
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+            padding: 8px !important;
+            width: 100% !important;
+            align-items: stretch !important;
+        }
+
+        .product-images {
+            gap: 6px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+            flex-basis: auto !important;
+        }
+
+        .main-image-wrapper {
+            border-radius: 8px !important;
+            min-height: 180px !important;
+        }
+
+        #main_image {
+            padding: 4px !important;
+            width: 100% !important;
+            max-height: 220px !important;
+            object-fit: contain !important;
+        }
+
+        .thumbnail {
+            width: 44px !important;
+            height: 44px !important;
+        }
+
+        html .product-info,
+        .product-info {
+            gap: 10px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+            flex-basis: auto !important;
+        }
+
+        .product-header {
+            padding-bottom: 8px !important;
+            border-bottom: 1px solid #f0f0f0 !important;
+        }
+
+        .product-header h1 {
+            font-size: 14px !important;
+            margin-bottom: 4px !important;
+            line-height: 1.2 !important;
+        }
+
+        .rating-section {
+            font-size: 10px !important;
+            gap: 3px !important;
+            flex-wrap: wrap !important;
+        }
+
+        .rating-stars {
+            font-size: 12px !important;
+            letter-spacing: 0px !important;
+        }
+
+        .product-cards {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+        }
+
+        .product-card img {
+            height: 140px !important;
+        }
+
+        .rating-text {
+            font-size: 9px !important;
+            word-break: break-word !important;
+        }
+
+        .product-badge {
+            padding: 2px 6px !important;
+            font-size: 8px !important;
+            margin-top: 2px !important;
+            width: fit-content !important;
+        }
+
+        .product-description {
+            font-size: 11px !important;
+            line-height: 1.3 !important;
+        }
+
+        .price-section {
+            padding: 8px !important;
+            gap: 6px !important;
+            border-radius: 6px !important;
+            flex-wrap: wrap !important;
+        }
+
+        .price-label {
+            font-size: 8px !important;
+            letter-spacing: 0px !important;
+        }
+
+        .price-value {
+            font-size: 18px !important;
+        }
+
+        .stock-text {
+            font-size: 9px !important;
+            gap: 2px !important;
+        }
+
+        .stock-text::before {
+            font-size: 9px !important;
+        }
+
+        .variants-section {
+            padding: 8px !important;
+        }
+
+        .variants-section h4 {
+            font-size: 9px !important;
+            margin-bottom: 5px !important;
+        }
+
+        .variant-list {
+            gap: 4px !important;
+            flex-wrap: wrap !important;
+        }
+
+        .variant_btn {
+            padding: 4px 8px !important;
+            font-size: 8px !important;
+        }
+
+        .action-buttons {
+            flex-direction: column !important;
+            gap: 5px !important;
+            margin-top: 8px !important;
+        }
+
+        .action-buttons button,
+        .action-buttons form button {
+            padding: 7px 12px !important;
+            font-size: 10px !important;
+        }
+
+        .favorite_btn {
+            width: 30px !important;
+            height: 30px !important;
+            font-size: 14px !important;
+        }
+
+        .back-button {
+            font-size: 11px !important;
+            margin-bottom: 10px !important;
+            gap: 4px !important;
+        }
+
+        html .reviews-section,
+        .reviews-section,
+        html .suggestions-section,
+        .suggestions-section {
+            padding: 8px !important;
+            margin-bottom: 10px !important;
+            border-radius: 8px !important;
+        }
+
+        .section-title {
+            font-size: 12px !important;
+            margin-bottom: 6px !important;
+            gap: 3px !important;
+            font-weight: 700 !important;
+        }
+
+        .ratings-container {
+            grid-template-columns: 1fr !important;
+            gap: 6px !important;
+            margin-bottom: 6px !important;
+        }
+
+        .rating-display {
+            padding: 6px !important;
+            background: #f9f9f9 !important;
+            border-radius: 6px !important;
+        }
+
+        .rating-large {
+            font-size: 20px !important;
+            margin-bottom: 1px !important;
+        }
+
+        .rating-info {
+            font-size: 8px !important;
+            line-height: 1.2 !important;
+        }
+
+        .stars {
+            font-size: 16px !important;
+            gap: 1px !important;
+            justify-content: center !important;
+        }
+
+        .comments-section {
+            border-top: 1px solid #f0f0f0 !important;
+            padding-top: 6px !important;
+        }
+
+        .comments-section h3 {
+            font-size: 11px !important;
+            margin-bottom: 6px !important;
+            font-weight: 600 !important;
+            color: #333 !important;
+        }
+
+        .comment-form {
+            padding: 6px !important;
+            margin-bottom: 8px !important;
+            border-radius: 6px !important;
+            background: #f9f9f9 !important;
+        }
+
+        .comment-form textarea {
+            padding: 6px !important;
+            font-size: 9px !important;
+            min-height: 45px !important;
+            border-radius: 4px !important;
+            border: 1px solid #ddd !important;
+        }
+
+        .comment-form button {
+            padding: 4px 8px !important;
+            font-size: 8px !important;
+            margin-top: 3px !important;
+        }
+
+        .review-item {
+            padding: 6px !important;
+            margin-bottom: 4px !important;
+            border-radius: 6px !important;
+            border-left: 2px solid #667eea !important;
+        }
+
+        .review-header {
+            margin-bottom: 2px !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 1px !important;
+        }
+
+        .review-username {
+            font-size: 8px !important;
+        }
+
+        .review-date {
+            font-size: 7px !important;
+        }
+
+        .review-rating {
+            font-size: 8px !important;
+            margin-bottom: 2px !important;
+        }
+
+        .review-comment {
+            font-size: 8px !important;
+            line-height: 1.3 !important;
+        }
+
+        .product-cards {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+        }
+
+        .product-card {
+            display: flex !important;
+            flex-direction: column !important;
+            border-radius: 8px !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            border: 1px solid #eef6fb !important;
+            background: #fff !important;
+        }
+
+        .product-card img {
+            width: 100% !important;
+            height: 160px !important;
+            object-fit: cover !important;
+            padding: 0 !important;
+            flex-shrink: 0 !important;
+        }
+
+        .product-name {
+            padding: 0.8rem !important;
+            flex-grow: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+
+        .product-name h4 {
+            font-size: 0.85rem !important;
+            margin: 0 !important;
+        }
+
+        .product-name p {
+            font-size: 0.85rem !important;
+            margin: 0 !important;
+        }
+
+        div[style*="padding: 0 20px 20px 20px"] {
+            padding: 0 12px 12px 12px !important;
+        }
+
+        div[style*="padding: 0 20px 20px 20px"] button {
+            width: 100% !important;
+            padding: 8px !important;
+            font-size: 13px !important;
+        }
+
+        .product-card .favorite_btn {
+            position: absolute !important;
+            top: 8px !important;
+            right: 8px !important;
+            margin-bottom: 0 !important;
+        }
+
+        .product-card .favorite_btn i {
+            font-size: 14px !important;
+        }
+
+        .product-card h4 {
+            font-size: 13px !important;
+            margin-bottom: 6px !important;
+            line-height: 1.2 !important;
+            color: #1a1a1a !important;
+        }
+
+        .product-card p {
+            font-size: 14px !important;
+            margin-bottom: 0 !important;
+            color: #667eea !important;
+            font-weight: 700 !important;
+        }
+
+        .product-card button {
+            padding: 8px 12px !important;
+            font-size: 13px !important;
+            width: auto !important;
+            grid-column: 3 !important;
+            grid-row: 1 / 3 !important;
+            align-self: start !important;
+            flex-shrink: 0 !important;
+        }
+
+        .product-tag {
+            padding: 3px 6px !important;
+            font-size: 8px !important;
+            top: 4px !important;
+            left: 4px !important;
+        }
+
+        div[style*="padding: 0 20px 20px 20px"] {
+            padding: 0 !important;
+            grid-column: 3 !important;
+            grid-row: 1 / -1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+        }
+
+        div[style*="padding: 0 20px 20px 20px"] button {
+            padding: 6px 12px !important;
+            font-size: 10px !important;
+            width: auto !important;
+        }
+    }
+
+    @media (max-width: 320px) {
+        html .product_itempage,
+        .product_itempage {
+            padding: 4px 2px !important;
+        }
+
+        .product-hero {
+            margin-bottom: 8px !important;
+            border-radius: 6px !important;
+        }
+
+        .hero-container {
+            display: flex !important;
+            flex-direction: column !important;
+            grid-template-columns: 1fr !important;
+            gap: 6px !important;
+            padding: 4px !important;
+            width: 100% !important;
+            align-items: stretch !important;
+        }
+
+        .product-images {
+            gap: 4px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+            flex-basis: auto !important;
+        }
+
+        .main-image-wrapper {
+            border-radius: 6px !important;
+            min-height: 120px !important;
+        }
+
+        #main_image {
+            padding: 2px !important;
+            max-height: 140px !important;
+        }
+
+        .thumbnail-container {
+            gap: 2px !important;
+        }
+
+        .thumbnail {
+            width: 32px !important;
+            height: 32px !important;
+        }
+
+        .product-info {
+            gap: 6px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+            flex-basis: auto !important;
+        }
+
+        .product-header {
+            padding-bottom: 6px !important;
+            border-bottom: 1px solid #f0f0f0 !important;
+        }
+
+        .product-header h1 {
+            font-size: 11px !important;
+            margin-bottom: 2px !important;
+        }
+
+        .rating-section {
+            font-size: 7px !important;
+            gap: 2px !important;
+        }
+
+        .rating-stars {
+            font-size: 9px !important;
+            letter-spacing: 0px !important;
+        }
+
+        .rating-text {
+            font-size: 6px !important;
+        }
+
+        .product-badge {
+            padding: 1px 4px !important;
+            font-size: 6px !important;
+            margin-top: 1px !important;
+        }
+
+        .product-description {
+            font-size: 8px !important;
+            line-height: 1.2 !important;
+        }
+
+        .price-section {
+            padding: 6px !important;
+            gap: 4px !important;
+        }
+
+        .price-text {
+            gap: 1px !important;
+        }
+
+        .price-label {
+            font-size: 6px !important;
+        }
+
+        .price-value {
+            font-size: 13px !important;
+        }
+
+        .stock-text {
+            font-size: 6px !important;
+            gap: 1px !important;
+        }
+
+        .stock-text::before {
+            font-size: 8px !important;
+        }
+
+        .variants-section {
+            padding: 4px !important;
+        }
+
+        .variants-section h4 {
+            font-size: 7px !important;
+            margin-bottom: 2px !important;
+        }
+
+        .variant-list {
+            gap: 2px !important;
+        }
+
+        .variant_btn {
+            padding: 2px 4px !important;
+            font-size: 6px !important;
+        }
+
+        .action-buttons {
+            flex-direction: column !important;
+            gap: 3px !important;
+            margin-top: 4px !important;
+        }
+
+        .action-buttons button,
+        .action-buttons form button {
+            padding: 5px 8px !important;
+            font-size: 7px !important;
+        }
+
+        .favorite_btn {
+            width: 28px !important;
+            height: 28px !important;
+            font-size: 13px !important;
+        }
+
+        .back-button {
+            font-size: 8px !important;
+            margin-bottom: 6px !important;
+        }
+
+        html .reviews-section,
+        .reviews-section,
+        html .suggestions-section,
+        .suggestions-section {
+            padding: 6px !important;
+            margin-bottom: 8px !important;
+            border-radius: 6px !important;
+        }
+
+        .section-title {
+            font-size: 11px !important;
+            margin-bottom: 4px !important;
+            gap: 2px !important;
+        }
+
+        .ratings-container {
+            gap: 4px !important;
+            margin-bottom: 4px !important;
+        }
+
+        .rating-display {
+            padding: 4px !important;
+            background: #f9f9f9 !important;
+            border-radius: 4px !important;
+        }
+
+        .rating-large {
+            font-size: 16px !important;
+            margin-bottom: 0px !important;
+        }
+
+        .rating-info {
+            font-size: 6px !important;
+            line-height: 1 !important;
+        }
+
+        .stars {
+            font-size: 12px !important;
+            gap: 1px !important;
+        }
+
+        .comments-section {
+            border-top: 1px solid #f0f0f0 !important;
+            padding-top: 4px !important;
+        }
+
+        .comments-section h3 {
+            font-size: 10px !important;
+            margin-bottom: 4px !important;
+        }
+
+        .comment-form {
+            padding: 4px !important;
+            margin-bottom: 6px !important;
+        }
+
+        .comment-form textarea {
+            padding: 4px !important;
+            font-size: 7px !important;
+            min-height: 40px !important;
+        }
+
+        .comment-form button {
+            padding: 3px 6px !important;
+            font-size: 7px !important;
+            margin-top: 2px !important;
+        }
+
+        .review-item {
+            padding: 4px !important;
+            margin-bottom: 2px !important;
+            border-left: 1px solid #667eea !important;
+        }
+
+        .review-header {
+            margin-bottom: 1px !important;
+            gap: 0px !important;
+        }
+
+        .review-username {
+            font-size: 7px !important;
+        }
+
+        .review-date {
+            font-size: 6px !important;
+        }
+
+        .review-rating {
+            font-size: 7px !important;
+            margin-bottom: 1px !important;
+        }
+
+        .review-comment {
+            font-size: 7px !important;
+            line-height: 1.2 !important;
+        }
+
+        .product-cards {
+            gap: 6px !important;
+        }
+
+        .product-card {
+            border-radius: 6px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            position: relative !important;
+            background: white !important;
+            border: 1px solid #e8e8e8 !important;
+            overflow: hidden !important;
+        }
+
+        .product-card img {
+            width: 100% !important;
+            height: 100px !important;
+            object-fit: contain !important;
+            padding: 8px !important;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+            border-radius: 0 !important;
+        }
+
+        .product-name {
+            padding: 8px !important;
+        }
+
+        .product-name h4 {
+            font-size: 11px !important;
+            margin-bottom: 4px !important;
+        }
+
+        .product-name p {
+            font-size: 11px !important;
+            margin-bottom: 6px !important;
+        }
+
+        div[style*="padding: 0 20px 20px 20px"] {
+            padding: 0 8px 8px 8px !important;
+        }
+
+        div[style*="padding: 0 20px 20px 20px"] button {
+            width: 100% !important;
+            padding: 6px !important;
+            font-size: 10px !important;
+        }
+
+        .product-card .favorite_btn {
+            position: absolute !important;
+            top: 6px !important;
+            right: 6px !important;
+            margin-bottom: 0 !important;
+        }
+
+        .product-card .favorite_btn i {
+            font-size: 12px !important;
+        }
+
+        .product-tag {
+            padding: 1px 2px !important;
+            font-size: 6px !important;
+            top: 2px !important;
+            left: 2px !important;
+        }
+
+        div[style*="padding: 0 20px 20px 20px"] button {
+            padding: 4px 8px !important;
+            font-size: 7px !important;
+        }
+    }
+</style>
+
+<div class="product_itempage">
+    <div class="content-section">
+        <a href="{% url 'product' %}" class="back-button">
+            ← Back to Products
+        </a>
+
+<!-- Three.js and related libraries for 3D model viewing - Load FIRST -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/loaders/GLTFLoader.js"></script>
+
+        {% if produkto %}
+        <div class="product-hero">
+            <div class="hero-container">
+                <!-- Product Images -->
+                <div class="product-images">
+                    <div class="image-canvas-container">
+                        <div class="main-image-wrapper">
+                            {% if main_image %}
+                                <img id="main_image" src="{{ main_image }}" alt="Product image" loading="lazy">
+                            {% elif produkto.image and produkto.image.name %}
+                                <img id="main_image" src="{{ produkto.image.url }}" alt="Product image" loading="lazy">
+                            {% elif produkto.productimage_set.first %}
+                                <img id="main_image" src="{{ produkto.productimage_set.first.product_image.url }}" alt="Product image" loading="lazy">
+                            {% endif %}
+                        </div>
+                        <div id="canvas-3d-wrapper" class="canvas-3d-wrapper">
+                            <canvas id="model-3d-canvas" class="model-3d-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="thumbnail-container">
+                        {% for img_url in thumbnails %}
+                            <img class="thumbnail {% if forloop.first %}active-thumb{% endif %}" src="{{ img_url }}" data-image="{{ img_url }}" alt="Thumbnail {{ forloop.counter }}" loading="lazy">
+                        {% endfor %}
+                    </div>
+                    {% if produkto.model_3d %}
+                    <button id="toggle-3d-btn" class="view-3d-button">👁️ View 3D Model</button>
+                    {% endif %}
+                </div>
+
+                <!-- Product Info -->
+                <div class="product-info">
+                    <div class="product-header">
+                        <h1>{{ display_name }}</h1>
+                        <div class="rating-section">
+                            <div class="rating-stars">
+                                {% if reviews %}
+                                    {% with avg=average_rating|floatformat:0 %}
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= avg %}★{% else %}☆{% endif %}
+                                        {% endfor %}
+                                    {% endwith %}
+                                {% else %}
+                                    ☆☆☆☆☆
+                                {% endif %}
+                            </div>
+                            <div class="rating-text">{{ average_rating|default:"No reviews" }} / 5 ({{ reviews.count }} reviews)</div>
+                        </div>
+                        <span class="product-badge">Premium Quality</span>
+                    </div>
+
+                    <div class="price-section">
+                        <div class="price-text">
+                            <span class="price-label">Price</span>
+                            <span class="price-value">₱{{ price|intcomma }}</span>
+                        </div>
+                        <div class="stock-text">
+                            {{ stock }} in stock
+                        </div>
+                    </div>
+
+                    {% if variations %}
+                    <div class="variants-section">
+                        <h4>Choose Specification:</h4>
+                        <div class="variant-list">
+                        {% for variant in variations %}
+                            <a class="variant_btn" href="{% url 'product_item' variant.product.id %}?variant={{ variant.id }}">{{ variant.product_variation }}</a>
+                        {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div>
+                        <h4 style="margin-bottom: 15px; color: #333; font-weight: 600;">Description</h4>
+                        <p class="product-description">{{ display_description|linebreaks }}</p>
+                    </div>
+
+                    <div class="action-buttons">
+                        <form action="{% url 'add_to_cart' produkto.id %}" method="POST">
+                            {% csrf_token %}
+                            {% if selected_variant %}
+                                <input type="hidden" name="variant_id" value="{{ selected_variant.id }}">
+                            {% endif %}
+                            <button>🛒 Add to Cart</button>
+                        </form>
+                        <form action="{% url 'direct_checkout' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ produkto.id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            {% if selected_variant %}
+                                <input type="hidden" name="variant_id" value="{{ selected_variant.id }}">
+                            {% endif %}
+                            <button type="submit">💳 Buy Now</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="reviews-section">
+            <h2 class="section-title">⭐ Customer Reviews</h2>
+
+            <div class="ratings-container">
+                <div class="rating-display">
+                    <div class="rating-large">{{ average_rating|default:"N/A" }}</div>
+                    <div class="rating-info">out of 5 stars</div>
+                    <div class="rating-info" style="margin-top: 10px;">{{ reviews.count }} reviews</div>
+                </div>
+            </div>
+
+            <div class="comments-section">
+                <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 24px; color: #1a1a1a; letter-spacing: -0.5px;">Customer Reviews</h3>
+
+                {% if user.is_authenticated %}
+                    {% if user_review %}
+                    <!-- User already has a review -->
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 20px; margin-bottom: 28px; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                            <i class="fa-solid fa-check-circle" style="color: white; font-size: 20px;"></i>
+                            <span style="color: white; font-weight: 600; font-size: 14px;">Your Review</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.95); border-radius: 8px; padding: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                <div>
+                                    <p style="font-weight: 600; color: #1a1a1a; margin: 0 0 4px 0;">{{ user.first_name|default:user.username }}</p>
+                                    <p style="font-size: 12px; color: #999; margin: 0;">{{ user_review.created_at|date:"M d, Y" }}</p>
+                                </div>
+                                <div style="display: flex; gap: 6px; align-items: center;">
+                                    {% for i in "12345" %}
+                                        <span style="color: {% if forloop.counter <= user_review.rating %}#ffc107{% else %}#e0e0e0{% endif %}; font-size: 16px;">★</span>
+                                    {% endfor %}
+                                    <span style="font-weight: 600; color: #666; margin-left: 8px;">{{ user_review.rating }}/5</span>
+                                </div>
+                            </div>
+                            <p style="color: #555; line-height: 1.6; margin: 0; font-size: 14px;">{{ user_review.comment }}</p>
+                            <a href="#edit-review" style="display: inline-block; margin-top: 12px; color: #667eea; font-size: 13px; font-weight: 600; text-decoration: none; transition: color 0.2s;">✏️ Edit Your Review</a>
+                        </div>
+                    </div>
+
+                    <!-- Edit Review Form (Initially Hidden) -->
+                    <form method="POST" id="edit-review" class="comment-form" style="display: none; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 28px;">
+                        {% csrf_token %}
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 10px;">Update Your Rating</label>
+                            <div class="stars" id="edit_star_container" data-current-rating="{{ user_review.rating }}">
+                                <input type="hidden" name="rating" id="editRatingValue" value="{{ user_review.rating }}">
+                                <span data-star="1" style="cursor: pointer; font-size: 24px;">★</span>
+                                <span data-star="2" style="cursor: pointer; font-size: 24px;">★</span>
+                                <span data-star="3" style="cursor: pointer; font-size: 24px;">★</span>
+                                <span data-star="4" style="cursor: pointer; font-size: 24px;">★</span>
+                                <span data-star="5" style="cursor: pointer; font-size: 24px;">★</span>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <textarea name="comment" placeholder="Update your review..." style="width: 100%; min-height: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 14px; resize: vertical;">{{ user_review.comment }}</textarea>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" style="flex: 1; background: #667eea; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Update Review</button>
+                            <button type="button" onclick="document.getElementById('edit-review').style.display='none'" style="flex: 1; background: #e0e0e0; color: #333; padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Cancel</button>
+                        </div>
+                    </form>
+
+                    <script>
+                        // Setup edit star rating - wait for DOM to be ready
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const editStarContainer = document.getElementById('edit_star_container');
+                            const editStars = editStarContainer ? editStarContainer.querySelectorAll('span[data-star]') : [];
+                            const editRatingValue = document.getElementById('editRatingValue');
+                            
+                            if (editStars.length === 0) {
+                                console.log('Edit stars not found');
+                                return;
+                            }
+                            
+                            // Initialize stars
+                            const initialRating = editRatingValue ? parseInt(editRatingValue.value) || 0 : 0;
+                            
+                            function updateEditStarHover(rating) {
+                                editStars.forEach(star => {
+                                    const starNum = parseInt(star.getAttribute('data-star'));
+                                    if (starNum <= parseInt(rating)) {
+                                        star.style.setProperty('color', '#ffc107', 'important');
+                                    } else {
+                                        star.style.setProperty('color', '#e0e0e0', 'important');
+                                    }
+                                });
+                            }
+                            
+                            function updateEditStarDisplay() {
+                                const currentRating = editRatingValue ? parseInt(editRatingValue.value) || 0 : 0;
+                                editStars.forEach(star => {
+                                    const starNum = parseInt(star.getAttribute('data-star'));
+                                    if (starNum <= currentRating) {
+                                        star.style.setProperty('color', '#ffc107', 'important');
+                                    } else {
+                                        star.style.setProperty('color', '#e0e0e0', 'important');
+                                    }
+                                });
+                            }
+                            
+                            editStars.forEach(star => {
+                                star.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const rating = parseInt(this.getAttribute('data-star'));
+                                    console.log('Edit star clicked:', rating);
+                                    if (editRatingValue) {
+                                        editRatingValue.value = rating;
+                                    }
+                                    updateEditStarDisplay();
+                                });
+                                
+                                star.addEventListener('mouseover', function() {
+                                    const hoverRating = parseInt(this.getAttribute('data-star'));
+                                    updateEditStarHover(hoverRating);
+                                });
+                            });
+                            
+                            if (editStarContainer) {
+                                editStarContainer.addEventListener('mouseleave', function() {
+                                    updateEditStarDisplay();
+                                });
+                            }
+                            
+                            // Initialize display
+                            updateEditStarDisplay();
+
+                            // Show edit form on click
+                            const editLink = document.querySelector('a[href="#edit-review"]');
+                            if (editLink) {
+                                editLink.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    const editForm = document.getElementById('edit-review');
+                                    if (editForm) {
+                                        editForm.style.display = 'block';
+                                        editForm.scrollIntoView({ behavior: 'smooth' });
+                                        updateEditStarDisplay();
+                                    }
+                                });
+                            }
+                        });
+                    </script>
+                    {% else %}
+                    <!-- New Review Form -->
+                    <form method="POST" class="comment-form" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); border: 2px solid #667eea; border-radius: 12px; padding: 24px; margin-bottom: 28px;">
+                        {% csrf_token %}
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <label style="font-size: 14px; font-weight: 600; color: #1a1a1a;">Rate this product</label>
+                                <span id="ratingDisplay" style="font-size: 13px; color: #667eea; font-weight: 600; display: none;">
+                                    <span id="selectedRating">0</span>/5 stars selected
+                                </span>
+                            </div>
+                            <div class="stars" id="star_container" data-current-rating="0" style="display: flex; gap: 8px;">
+                                <input type="hidden" name="rating" id="ratingValue" value="">
+                                <span data-star="1" style="cursor: pointer; font-size: 28px; transition: all 0.2s; color: #e0e0e0;">★</span>
+                                <span data-star="2" style="cursor: pointer; font-size: 28px; transition: all 0.2s; color: #e0e0e0;">★</span>
+                                <span data-star="3" style="cursor: pointer; font-size: 28px; transition: all 0.2s; color: #e0e0e0;">★</span>
+                                <span data-star="4" style="cursor: pointer; font-size: 28px; transition: all 0.2s; color: #e0e0e0;">★</span>
+                                <span data-star="5" style="cursor: pointer; font-size: 28px; transition: all 0.2s; color: #e0e0e0;">★</span>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <textarea name="comment" placeholder="Share your experience with this product..." style="width: 100%; min-height: 120px; padding: 14px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 14px; resize: vertical; transition: border-color 0.3s;"></textarea>
+                        </div>
+                        <button type="submit" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 32px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">Submit Review</button>
+                    </form>
+                    
+                    <script>
+                        // Handle star rating display - wait for DOM to be ready
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const starContainer = document.getElementById('star_container');
+                            const ratingValue = document.getElementById('ratingValue');
+                            const ratingDisplay = document.getElementById('ratingDisplay');
+                            const selectedRating = document.getElementById('selectedRating');
+                            const stars = starContainer ? starContainer.querySelectorAll('span[data-star]') : [];
+                            
+                            if (stars.length === 0) {
+                                console.log('Stars not found');
+                                return;
+                            }
+                            
+                            // Initialize stars to gray
+                            stars.forEach(s => {
+                                s.style.setProperty('color', '#e0e0e0', 'important');
+                            });
+                            
+                            function updateStarDisplay(rating) {
+                                stars.forEach(s => {
+                                    const starNum = parseInt(s.getAttribute('data-star'));
+                                    if (starNum <= rating) {
+                                        s.style.setProperty('color', '#ffc107', 'important');
+                                    } else {
+                                        s.style.setProperty('color', '#e0e0e0', 'important');
+                                    }
+                                });
+                            }
+                            
+                            function updateStarHover(rating) {
+                                stars.forEach(s => {
+                                    const starNum = parseInt(s.getAttribute('data-star'));
+                                    if (starNum <= rating) {
+                                        s.style.setProperty('color', '#ffc107', 'important');
+                                    } else {
+                                        s.style.setProperty('color', '#e0e0e0', 'important');
+                                    }
+                                });
+                            }
+                            
+                            stars.forEach(star => {
+                                star.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const rating = parseInt(this.getAttribute('data-star'));
+                                    console.log('Star clicked:', rating);
+                                    ratingValue.value = rating;
+                                    selectedRating.textContent = rating;
+                                    ratingDisplay.style.display = 'inline';
+                                    updateStarDisplay(rating);
+                                });
+                                
+                                star.addEventListener('mouseover', function() {
+                                    const hoverRating = parseInt(this.getAttribute('data-star'));
+                                    updateStarHover(hoverRating);
+                                });
+                            });
+                            
+                            if (starContainer) {
+                                starContainer.addEventListener('mouseleave', function() {
+                                    const currentRating = parseInt(ratingValue.value) || 0;
+                                    updateStarDisplay(currentRating);
+                                });
+                            }
+                        });
+                    </script>
+                    {% endif %}
+                {% else %}
+                <div style="background: #f8f9fa; border-radius: 12px; padding: 32px; text-align: center; margin-bottom: 28px;">
+                    <i class="fa-solid fa-user-circle" style="font-size: 40px; color: #667eea; margin-bottom: 12px; display: block;"></i>
+                    <p style="font-size: 16px; color: #333; margin-bottom: 8px; font-weight: 600;">Want to share your experience?</p>
+                    <p style="font-size: 14px; color: #666; margin-bottom: 16px;">Login to leave a review and help other customers</p>
+                    <a href="{% url 'login' %}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+                        <i class="fa-solid fa-sign-in-alt"></i> Login to Review
+                    </a>
+                </div>
+                {% endif %}
+
+                <!-- All Reviews Display -->
+                <div style="margin-top: 32px;">
+                    <h4 style="font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 18px;">All Reviews ({{ reviews.count }})</h4>
+                    
+                    {% if reviews %}
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        {% for review in reviews %}
+                        <div style="background: white; border: 1px solid #e8e8e8; border-radius: 10px; padding: 18px; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                <div>
+                                    <p style="font-weight: 600; color: #1a1a1a; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+                                        <i class="fa-solid fa-user-circle" style="color: #667eea; font-size: 16px;"></i>
+                                        {{ review.user.first_name|default:review.user.username }}
+                                    </p>
+                                    <p style="font-size: 12px; color: #999; margin: 0;">{{ review.created_at|date:"M d, Y \a\t g:i A" }}</p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="display: flex; gap: 3px; margin-bottom: 4px; justify-content: flex-end;">
+                                        {% for i in "12345" %}
+                                            <span style="color: {% if forloop.counter <= review.rating %}#ffc107{% else %}#e0e0e0{% endif %}; font-size: 14px;">★</span>
+                                        {% endfor %}
+                                    </div>
+                                    <span style="font-weight: 700; color: #1a1a1a; font-size: 13px;">{{ review.rating }}/5</span>
+                                </div>
+                            </div>
+                            <p style="color: #555; line-height: 1.6; margin: 0; font-size: 14px;">{{ review.comment }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div style="text-align: center; padding: 48px 24px; background: #f8f9fa; border-radius: 10px; border: 1px dashed #ddd;">
+                        <i class="fa-solid fa-star" style="font-size: 32px; color: #ccc; margin-bottom: 12px; display: block;"></i>
+                        <p style="color: #999; font-size: 14px; margin: 0;">No reviews yet. Be the first to share your thoughts!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Suggestions Section -->
+        {% if products %}
+        <div class="suggestions-section">
+            <h2 class="section-title">🎯 You Might Also Like</h2>
+            <div class="product-cards">
+                {% for produkto in products %}
+                <div class="product-card">
+                    {% if produkto.category_name.category_name == 'Others' %}
+                        <span class="product-tag tag-secondhand">2nd Hand</span>
+                    {% elif produkto.created_at %}
+                        {% now "U" as current_timestamp %}
+                        {% with created_timestamp=produkto.created_at|date:"U" %}
+                            {% if current_timestamp|add:"-604800"|add:"0" < created_timestamp|add:"0" %}
+                                <span class="product-tag tag-new">New</span>
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
+                    <button class="favorite_btn {% if produkto.id|stringformat:'s' in favorites %}favorited{% endif %}" data-product-id="{{ produkto.id }}" aria-label="Toggle favorite" type="button">
+                        <i class="{% if produkto.id|stringformat:'s' in favorites %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                    </button>
+                    <a href="{% url 'product_item' produkto.id %}" style="text-decoration: none; color: inherit; display: block;">
+                        {% if produkto.image and produkto.image.name %}
+                        <img src="{{ produkto.image.url }}" alt="Product Image" loading="lazy">
+                        {% else %}
+                            {% with first_image=produkto.productimage_set.first %}
+                                {% if first_image and first_image.product_image and first_image.product_image.name %}
+                                <img src="{{ first_image.product_image.url }}" alt="Product Image" loading="lazy">
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                        <div class="product-name">
+                            <h4>{{ produkto.product_name }}</h4>
+                            <p>₱{{ produkto.price|intcomma }}</p>
+                            {% if produkto.reviews.all %}
+                                {% with avg_rating=produkto.reviews.all|dictsort:"rating"|last %}
+                                    {% with total_reviews=produkto.reviews.count %}
+                                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 6px;">
+                                            <span style="color: #ffc107; font-size: 15px;">
+                                                {% for i in "12345" %}{% if forloop.counter <= avg_rating.rating %}★{% else %}☆{% endif %}{% endfor %}
+                                            </span>
+                                            <span style="font-size: 11px; color: #666;">({{ total_reviews }})</span>
+                                        </div>
+                                    {% endwith %}
+                                {% endwith %}
+                            {% else %}
+                                <div style="display: flex; align-items: center; gap: 6px; margin-top: 6px;">
+                                    <span style="color: #ddd; font-size: 15px;">☆☆☆☆☆</span>
+                                    <span style="font-size: 11px; color: #999;">No reviews</span>
+                                </div>
+                            {% endif %}
+                            <form action="{% url 'add_to_cart' produkto.id %}" method="POST" style="width: 100%; margin-top: auto;">
+                                {% csrf_token %}
+                                <button type="submit" style="width: 100%;">Add to Cart</button>
+                            </form>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // Favorite button is handled globally by base.js using event delegation
+
+        // Handle thumbnail clicks
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const mainImage = document.getElementById('main_image');
+
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', function() {
+                const imageUrl = this.getAttribute('data-image');
+                if (mainImage && imageUrl) {
+                    mainImage.src = imageUrl;
+                    
+                    // Update active thumbnail
+                    thumbnails.forEach(t => t.classList.remove('active-thumb'));
+                    this.classList.add('active-thumb');
+                }
+            });
+        });
+
+        // Handle star rating for new review form
+        const starContainer = document.getElementById('star_container');
+        if (starContainer) {
+            const stars = document.querySelectorAll('#star_container span');
+            const ratingValue = document.getElementById('ratingValue');
+            const currentRating = parseInt(starContainer.getAttribute('data-current-rating')) || 0;
+
+            // Initialize the display with current rating
+            function updateStarDisplay(rating) {
+                stars.forEach(s => {
+                    if (parseInt(s.getAttribute('data-star')) <= rating) {
+                        s.style.color = '#ffc107';
+                    } else {
+                        s.style.color = '#e0e0e0';
+                    }
+                });
+            }
+
+            // Set initial display based on current rating
+            if (currentRating > 0) {
+                ratingValue.value = currentRating;
+                updateStarDisplay(currentRating);
+            }
+
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.getAttribute('data-star'));
+                    ratingValue.value = rating;
+                    starContainer.setAttribute('data-current-rating', rating);
+                    updateStarDisplay(rating);
+                });
+
+                star.addEventListener('mouseover', function() {
+                    const rating = parseInt(this.getAttribute('data-star'));
+                    stars.forEach(s => {
+                        if (parseInt(s.getAttribute('data-star')) <= rating) {
+                            s.style.color = '#667eea';
+                        } else {
+                            s.style.color = '#e0e0e0';
+                        }
+                    });
+                });
+            });
+
+            starContainer.addEventListener('mouseout', function() {
+                const rating = parseInt(this.getAttribute('data-current-rating')) || 0;
+                updateStarDisplay(rating);
+            });
+        }
+
+        // Handle comment form submission
+        const commentForm = document.querySelector('form.comment-form');
+        if (commentForm) {
+            commentForm.addEventListener('submit', function(e) {
+                const ratingValue = commentForm.querySelector('input[name="rating"]');
+                const commentTextarea = commentForm.querySelector('textarea[name="comment"]');
+                
+                // Check if rating is selected
+                if (!ratingValue || !ratingValue.value) {
+                    e.preventDefault();
+                    alert('Please select a rating before submitting your review.');
+                    return false;
+                }
+                
+                // Check if comment is provided
+                if (!commentTextarea || !commentTextarea.value.trim()) {
+                    e.preventDefault();
+                    alert('Please write a comment before submitting your review.');
+                    return false;
+                }
+                
+                // Add rating to form data
+                ratingValue.value = parseInt(ratingValue.value) || 0;
+                return true;
+            });
+        }
+
+        // ===== 3D Model Viewer - BULLETPROOF VERSION =====
+        // Wait for DOM to be fully ready
+        function init3DViewer() {
+            const toggle3DBtn = document.getElementById('toggle-3d-btn');
+            const mainImage = document.getElementById('main_image');
+            const canvas3D = document.getElementById('model-3d-canvas');
+            
+            // Get model URL - use proxy endpoint for B2 storage access with CORS headers
+            // TEMPLATE DEBUG: Check if this code is being executed
+            console.warn('🚀 TEMPLATE FIX ACTIVE - Line 2398 executing');
+            let modelURL = '{% if produkto.model_3d %}/api/product/{{ produkto.id }}/model-3d/{% endif %}';
+            console.warn('✅ modelURL set to:', modelURL);
+            
+            // If it's an object representation, extract the URL
+            if (modelURL && typeof modelURL === 'string') {
+                modelURL = modelURL.trim();
+            }
+            
+            let scene, camera, renderer, model;
+            let is3DActive = false;
+            let animationId = null;
+            let viewer3DInitialized = false;
+
+            console.log('=== 3D Viewer Initialization Start ===');
+            console.log('Button element:', toggle3DBtn);
+            console.log('Canvas element:', canvas3D);
+            console.log('Raw modelURL:', modelURL);
+            console.log('modelURL length:', modelURL ? modelURL.length : 0);
+            console.log('modelURL empty?:', !modelURL || modelURL === '');
+            console.log('THREE available:', typeof THREE);
+            console.log('GLTFLoader available:', typeof THREE !== 'undefined' ? typeof THREE.GLTFLoader : 'N/A');
+
+            // Validation checks
+            if (!toggle3DBtn) {
+                console.error('ERROR: Button #toggle-3d-btn not found in DOM');
+                return;
+            }
+            if (!canvas3D) {
+                console.error('ERROR: Canvas #model-3d-canvas not found in DOM');
+                return;
+            }
+            if (!modelURL) {
+                console.error('ERROR: Model URL is empty or undefined');
+                console.error('This likely means produkto.model_3d is empty in the database');
+                return;
+            }
+
+            function startAnimationLoop() {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+                
+                function animate() {
+                    animationId = requestAnimationFrame(animate);
+                    
+                    if (model && is3DActive) {
+                        model.rotation.y += 0.005;
+                    }
+                    
+                    if (renderer && scene && camera) {
+                        renderer.render(scene, camera);
+                    }
+                }
+                console.log('Starting animation loop');
+                animate();
+            }
+
+            function initiate3DViewer() {
+                console.log('initiate3DViewer() called');
+                
+                // Check libraries
+                if (typeof THREE === 'undefined') {
+                    console.error('THREE not loaded, waiting...');
+                    setTimeout(initiate3DViewer, 500);
+                    return;
+                }
+                if (typeof THREE.GLTFLoader === 'undefined') {
+                    console.error('GLTFLoader not loaded, waiting...');
+                    setTimeout(initiate3DViewer, 500);
+                    return;
+                }
+
+                if (viewer3DInitialized) {
+                    console.log('3D viewer already initialized, reusing scene');
+                    startAnimationLoop();
+                    return;
+                }
+
+                try {
+                    const canvas3DWrapper = document.getElementById('canvas-3d-wrapper');
+                    const width = canvas3DWrapper.clientWidth;
+                    const height = canvas3DWrapper.clientHeight;
+
+                    console.log('Canvas wrapper size:', width, 'x', height);
+                    console.log('Canvas wrapper element:', canvas3DWrapper);
+                    
+                    // Make sure canvas is visible
+                    canvas3D.style.display = 'block';
+                    canvas3D.style.width = '100%';
+                    canvas3D.style.height = '100%';
+                    canvas3D.style.position = 'absolute';
+                    canvas3D.style.top = '0';
+                    canvas3D.style.left = '0';
+                    canvas3D.style.zIndex = '10';
+                    console.log('Canvas visibility and styles set');
+
+                    // Create scene
+                    scene = new THREE.Scene();
+                    scene.background = new THREE.Color(0xeeeeee);
+                    console.log('Scene created');
+
+                    // Create camera - use actual dimensions
+                    const actualWidth = canvas3D.clientWidth || width;
+                    const actualHeight = canvas3D.clientHeight || height;
+                    console.log('Actual canvas size:', actualWidth, 'x', actualHeight);
+                    
+                    camera = new THREE.PerspectiveCamera(75, actualWidth / actualHeight, 0.1, 1000);
+                    camera.position.set(0, 0, 8);
+                    console.log('Camera created');
+
+                    // Create renderer
+                    renderer = new THREE.WebGLRenderer({
+                        canvas: canvas3D,
+                        antialias: true,
+                        alpha: false,
+                        preserveDrawingBuffer: true
+                    });
+                    
+                    // Set renderer size based on actual canvas size
+                    renderer.setSize(actualWidth, actualHeight, false);
+                    renderer.setPixelRatio(window.devicePixelRatio);
+                    renderer.setClearColor(0xeeeeee, 1);
+                    renderer.outputEncoding = THREE.sRGBEncoding;
+                    console.log('Renderer created with size:', actualWidth, 'x', actualHeight);
+
+                    // Add lights
+                    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+                    scene.add(ambientLight);
+
+                    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+                    directionalLight.position.set(5, 5, 5);
+                    scene.add(directionalLight);
+
+                    console.log('Lights added');
+
+                    // Load model
+                    const loader = new THREE.GLTFLoader();
+                    
+                    // Construct the model path
+                    let modelPath = modelURL;
+                    if (!modelPath.startsWith('http') && !modelPath.startsWith('/')) {
+                        // If it's a relative path without leading slash, add /media/
+                        modelPath = '/media/' + modelPath;
+                    } else if (!modelPath.startsWith('http') && modelPath.startsWith('/')) {
+                        // If it already has leading slash, it's ready
+                        modelPath = modelPath;
+                    }
+                    
+                    console.log('Constructed modelPath:', modelPath);
+                    
+                    loader.load(
+                        modelPath,
+                        function(gltf) {
+                            console.log('✓ Model loaded successfully');
+                            model = gltf.scene;
+                            
+                            // Center and scale
+                            const box = new THREE.Box3().setFromObject(model);
+                            const center = box.getCenter(new THREE.Vector3());
+                            const size = box.getSize(new THREE.Vector3());
+                            const maxDim = Math.max(size.x, size.y, size.z);
+                            const scale = 3 / maxDim;
+                            
+                            model.position.sub(center);
+                            model.scale.multiplyScalar(scale);
+                            
+                            scene.add(model);
+                            console.log('✓ Model added to scene');
+                            
+                            // Initial render
+                            renderer.render(scene, camera);
+                            startAnimationLoop();
+                        },
+                        undefined,
+                        function(error) {
+                            console.error('✗ Model loading failed:', error);
+                            console.error('Tried to load from:', modelPath);
+                        }
+                    );
+
+                    viewer3DInitialized = true;
+                    console.log('✓ 3D viewer setup complete');
+
+                    // Handle window resize
+                    window.addEventListener('resize', () => {
+                        if (!canvas3D || !camera || !renderer) return;
+                        const newWidth = canvas3D.clientWidth;
+                        const newHeight = canvas3D.clientHeight;
+                        camera.aspect = newWidth / newHeight;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(newWidth, newHeight, false);
+                    });
+
+                    // Mouse controls
+                    let isDragging = false;
+                    let previousMousePosition = { x: 0, y: 0 };
+                    let previousTouchDistance = 0;
+                    let lastTouchTime = 0;
+                    const touchThrottle = 16; // ~60fps
+
+                    canvas3D.addEventListener('mousedown', (e) => {
+                        isDragging = true;
+                        previousMousePosition = { x: e.clientX, y: e.clientY };
+                    });
+
+                    canvas3D.addEventListener('mousemove', (e) => {
+                        if (isDragging && model) {
+                            const deltaX = e.clientX - previousMousePosition.x;
+                            const deltaY = e.clientY - previousMousePosition.y;
+                            model.rotation.y += deltaX * 0.01;
+                            model.rotation.x += deltaY * 0.01;
+                            previousMousePosition = { x: e.clientX, y: e.clientY };
+                        }
+                    });
+
+                    canvas3D.addEventListener('mouseup', () => {
+                        isDragging = false;
+                    });
+
+                    canvas3D.addEventListener('mouseleave', () => {
+                        isDragging = false;
+                    });
+
+                    // Zoom
+                    canvas3D.addEventListener('wheel', (e) => {
+                        e.preventDefault();
+                        const zoomSpeed = e.deltaY > 0 ? 1.1 : 0.9;
+                        camera.position.z *= zoomSpeed;
+                        camera.position.z = Math.max(1, Math.min(10, camera.position.z));
+                    });
+
+                    // Touch controls for mobile
+                    canvas3D.addEventListener('touchstart', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        lastTouchTime = Date.now();
+                        
+                        if (e.touches.length === 1) {
+                            // Single finger - rotation
+                            isDragging = true;
+                            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                        } else if (e.touches.length === 2) {
+                            // Two fingers - pinch zoom
+                            const dx = e.touches[0].clientX - e.touches[1].clientX;
+                            const dy = e.touches[0].clientY - e.touches[1].clientY;
+                            previousTouchDistance = Math.sqrt(dx * dx + dy * dy);
+                        }
+                    }, { passive: false });
+
+                    canvas3D.addEventListener('touchmove', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        
+                        const now = Date.now();
+                        if (now - lastTouchTime < touchThrottle) return;
+                        lastTouchTime = now;
+                        
+                        if (e.touches.length === 1 && isDragging && model) {
+                            // Single finger drag - rotation
+                            const deltaX = e.touches[0].clientX - previousMousePosition.x;
+                            const deltaY = e.touches[0].clientY - previousMousePosition.y;
+                            model.rotation.y += deltaX * 0.01;
+                            model.rotation.x += deltaY * 0.01;
+                            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                        } else if (e.touches.length === 2) {
+                            // Two finger pinch - zoom
+                            const dx = e.touches[0].clientX - e.touches[1].clientX;
+                            const dy = e.touches[0].clientY - e.touches[1].clientY;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (previousTouchDistance > 0) {
+                                // Pinch closer (distance decreases) = zoom in
+                                // Pinch further (distance increases) = zoom out
+                                const zoomSpeed = distance > previousTouchDistance ? 0.99 : 1.01;
+                                camera.position.z *= zoomSpeed;
+                                camera.position.z = Math.max(1, Math.min(10, camera.position.z));
+                                previousTouchDistance = distance;
+                            }
+                        }
+                    }, { passive: false });
+
+                    canvas3D.addEventListener('touchend', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        isDragging = false;
+                        previousTouchDistance = 0;
+                    }, { passive: false });
+
+                } catch (error) {
+                    console.error('Error during 3D viewer init:', error);
+                }
+            }
+
+            // Attach button listener
+            console.log('Attaching click listener to button');
+            toggle3DBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('>>> BUTTON CLICKED <<<');
+                is3DActive = !is3DActive;
+                
+                const mainImageWrapper = document.querySelector('.main-image-wrapper');
+                const canvas3DWrapper = document.getElementById('canvas-3d-wrapper');
+                
+                if (is3DActive) {
+                    console.log('Switching TO 3D view');
+                    mainImageWrapper.classList.add('hidden');
+                    canvas3DWrapper.classList.add('active');
+                    toggle3DBtn.classList.add('active');
+                    toggle3DBtn.textContent = '🖼️ View Image';
+                    
+                    console.log('Image wrapper hidden, canvas wrapper shown');
+                    
+                    if (!viewer3DInitialized) {
+                        console.log('First time, initializing 3D viewer');
+                        initiate3DViewer();
+                    } else {
+                        console.log('Reusing existing viewer');
+                        // Trigger a render
+                        if (renderer && scene && camera) {
+                            renderer.render(scene, camera);
+                        }
+                        startAnimationLoop();
+                    }
+                } else {
+                    console.log('Switching TO image view');
+                    mainImageWrapper.classList.remove('hidden');
+                    canvas3DWrapper.classList.remove('active');
+                    toggle3DBtn.classList.remove('active');
+                    toggle3DBtn.textContent = '👁️ View 3D Model';
+                    
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                        animationId = null;
+                    }
+                }
+            });
+
+            console.log('=== 3D Viewer Setup Complete ===');
+        }
+
+        // Initialize when DOM is fully loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init3DViewer);
+            console.log('DOM still loading, listener will trigger on DOMContentLoaded');
+        } else {
+            console.log('DOM already loaded, initializing immediately');
+            init3DViewer();
+        }
+    });
+</script>
+
+{% endblock %}

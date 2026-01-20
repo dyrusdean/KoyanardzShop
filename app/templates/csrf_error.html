@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSRF Verification Failed</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #033F63;
+            margin-bottom: 12px;
+            font-size: 28px;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .reasons {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 24px 0;
+            text-align: left;
+            border-radius: 4px;
+        }
+        .reasons h3 {
+            color: #033F63;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .reasons ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .reasons li {
+            color: #666;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+        .reasons li:before {
+            content: "• ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        a, button {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .btn-secondary {
+            background: #f0f2f7;
+            color: #667eea;
+            border: 2px solid #e0e6ff;
+        }
+        .btn-secondary:hover {
+            background: #e8ebf7;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e6ff;
+            font-size: 12px;
+            color: #999;
+        }
+        .debug-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 20px;
+            text-align: left;
+            font-size: 12px;
+            color: #856404;
+        }
+        .debug-info strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🔒</div>
+        <h1>Security Verification Failed</h1>
+        <p>We couldn't verify the security token for your request. This is a safety measure to protect your account.</p>
+        
+        <div class="reasons">
+            <h3>Why did this happen?</h3>
+            <ul>
+                <li>Your session may have expired</li>
+                <li>You were logged out in another tab or browser</li>
+                <li>Your browser has cookies disabled</li>
+                <li>You accessed the page from a third-party website</li>
+                <li>The form was submitted without a valid CSRF token</li>
+            </ul>
+        </div>
+
+        <div class="actions">
+            <button class="btn-secondary" onclick="history.back()">Go Back</button>
+            <a href="/" class="btn-primary">Return Home</a>
+        </div>
+
+        <div class="footer">
+            <p><strong>How to fix this:</strong></p>
+            <ol style="text-align: left; margin: 10px 0; padding-left: 20px;">
+                <li>Clear your browser cookies and cache</li>
+                <li>Try using an incognito/private window</li>
+                <li>Make sure cookies are enabled in your browser</li>
+                <li>Try a different browser if the problem persists</li>
+            </ol>
+        </div>
+
+        {% if debug %}
+        <div class="debug-info">
+            <strong>Debug Information (Development Only):</strong>
+            <p>Reason: {{ reason|default:"No reason provided" }}</p>
+            <p>This information is only visible in DEBUG mode.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

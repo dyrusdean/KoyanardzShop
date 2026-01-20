@@ -1,0 +1,255 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        /* Fallback font family in case Google Fonts timeout */
+        body, html, * {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400..700;1,400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <link href="{% static 'themewagon/dashtreme/assets/css/animate.css' %}" rel="stylesheet">
+    <link href="{% static 'themewagon/dashtreme/assets/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'themewagon/dashtreme/assets/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'themewagon/dashtreme/assets/css/app-style.css' %}" rel="stylesheet">
+    <link href="{% static 'themewagon/dashtreme/assets/css/sidebar-menu.css' %}" rel="stylesheet">
+    <link href="{% static 'themewagon/dashtreme/assets/css/pace.min.css' %}" rel="stylesheet">
+    <link href="{% static 'themewagon/dashtreme/assets/css/icons.css' %}" rel="stylesheet">
+    <!-- Font Awesome v6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- FIX: Font Awesome CDN CSS missing font-family property, manually add it -->
+    <style>
+        /* Apply Font Awesome font-family to all icon variants */
+        .fa:before,
+        .fa::before,
+        .fab:before,
+        .fab::before,
+        .fal:before,
+        .fal::before,
+        .far:before,
+        .far::before,
+        .fas:before,
+        .fas::before,
+        .fat:before,
+        .fat::before,
+        .fad:before,
+        .fad::before,
+        .fa-solid:before,
+        .fa-solid::before,
+        .fa-regular:before,
+        .fa-regular::before,
+        .fa-light:before,
+        .fa-light::before,
+        .fa-thin:before,
+        .fa-thin::before,
+        .fa-duotone:before,
+        .fa-duotone::before,
+        .fa-brands:before,
+        .fa-brands::before,
+        [class^="fa-"]:before,
+        [class*=" fa-"]:before,
+        [class^="fa-"]::before,
+        [class*=" fa-"]::before {
+            font-family: 'Font Awesome 6 Free' !important;
+        }
+        
+        .fa-solid::before,
+        .fas::before,
+        .fa-solid:before,
+        .fas:before {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 900 !important;
+        }
+        
+        .fa-regular::before,
+        .far::before,
+        .fa-regular:before,
+        .far:before {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 400 !important;
+        }
+        
+        .fa-light::before,
+        .fal::before,
+        .fa-light:before,
+        .fal:before {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 300 !important;
+        }
+        
+        .fa-thin::before,
+        .fat::before,
+        .fa-thin:before,
+        .fat:before {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 100 !important;
+        }
+        
+        .fa-brands::before,
+        .fab::before,
+        .fa-brands:before,
+        .fab:before {
+            font-family: 'Font Awesome 6 Brands' !important;
+            font-weight: 400 !important;
+        }
+        
+        .fa-duotone::before,
+        .fad::before,
+        .fa-duotone:before,
+        .fad:before {
+            font-family: 'Font Awesome 6 Duotone' !important;
+            font-weight: 900 !important;
+        }
+        
+        /* Ensure icons are visible */
+        i[class*="fa-"], 
+        .fa, 
+        .fa-solid, 
+        .fa-regular, 
+        .fa-light, 
+        .fa-thin, 
+        .fa-duotone,
+        .fa-brands {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <!-- Font Awesome v6.5.1 - Primary CDN (Cloudflare - Most Reliable) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- FIX: Font Awesome CDN CSS missing font-family property, manually add it -->
+    <style>
+        /* Apply Font Awesome font-family to all icon variants */
+        .fa:before,
+        .fa::before,
+        .fab:before,
+        .fab::before,
+        .fal:before,
+        .fal::before,
+        .far:before,
+        .far::before,
+        .fas:before,
+        .fas::before,
+        .fat:before,
+        .fat::before,
+        .fad:before,
+        .fad::before,
+        .fa-solid:before,
+        .fa-solid::before,
+        .fa-regular:before,
+        .fa-regular::before,
+        .fa-light:before,
+        .fa-light::before,
+        .fa-thin:before,
+        .fa-thin::before,
+        .fa-duotone:before,
+        .fa-duotone::before,
+        .fa-brands:before,
+        .fa-brands::before,
+        [class^="fa-"]:before,
+        [class*=" fa-"]:before,
+        [class^="fa-"]::before,
+        [class*=" fa-"]::before {
+            font-family: 'Font Awesome 6 Free' !important;
+        }
+        
+        .fa-solid::before,
+        .fas::before,
+        .fa-solid:before,
+        .fas:before {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 900 !important;
+        }
+        
+        .fa-regular::before,
+        .far::before,
+        .fa-regular:before,
+        .far:before {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 400 !important;
+        }
+        
+        .fa-light::before,
+        .fal::before,
+        .fa-light:before,
+        .fal:before {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 300 !important;
+        }
+        
+        .fa-thin::before,
+        .fat::before,
+        .fa-thin:before,
+        .fat:before {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 100 !important;
+        }
+        
+        .fa-brands::before,
+        .fab::before,
+        .fa-brands:before,
+        .fab:before {
+            font-family: 'Font Awesome 6 Brands' !important;
+            font-weight: 400 !important;
+        }
+        
+        .fa-duotone::before,
+        .fad::before,
+        .fa-duotone:before,
+        .fad:before {
+            font-family: 'Font Awesome 6 Duotone' !important;
+            font-weight: 900 !important;
+        }
+        
+        /* Ensure icons are visible */
+        i[class*="fa-"], 
+        .fa, 
+        .fa-solid, 
+        .fa-regular, 
+        .fa-light, 
+        .fa-thin, 
+        .fa-duotone,
+        .fa-brands {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+    </style>
+    <script src="{% static 'themewagon/dashtreme/assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'themewagon/dashtreme/assets/js/popper.min.js' %}"></script>
+    <script src="{% static 'themewagon/dashtreme/assets/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'themewagon/dashtreme/assets/js/sidebar-menu.js' %}"></script>
+    <script src="{% static 'themewagon/dashtreme/assets/js/Chart.min.js' %}"></script>
+    <script src="{% static 'themewagon/dashtreme/assets/js/app-script.js' %}"></script>
+    <script src="{% static 'themewagon/dashtreme/assets/js/index.js' %}"></script>
+    <script src="{% static 'themewagon/dashtreme/assets/js/chartjs-script.js' %}"></script>
+    <script src="{% static 'themewagon/dashtreme/assets/js/bootstrap.js' %}"></script>
+    <script src="{% static 'themewagon/dashtreme/assets/js/pace.min.js' %}"></script>
+    <script src="{% static 'js/admin.js' %}"></script>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-theme bg-theme1">
+    <div class="wrapper" id="wrapper">
+        {% include 'app/admin/admin_header.html' %}
+
+        <div class="content-wrapper">
+            {% include 'app/admin/admin_navigation.html' %}
+            <div class="container-fluid">
+            {% block content %}
+
+            {% endblock %}
+            </div>
+        </div>
+    </div> 
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

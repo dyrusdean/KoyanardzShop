@@ -1,0 +1,686 @@
+{% extends 'app/navigation.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .checkoutpage {
+        background: #f8fafb;
+        min-height: calc(100vh - 80px);
+        padding: 40px 20px;
+    }
+
+    .checkout_container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    /* Breadcrumb */
+    .uppercheckout {
+        background: transparent;
+        padding: 0 0 30px 0;
+        box-shadow: none;
+        margin-bottom: 30px;
+        border-bottom: none;
+    }
+
+    .uppercheckout a {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #38728F;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .uppercheckout a:hover {
+        color: #001A40;
+    }
+
+    .uppercheckout ul {
+        display: flex;
+        align-items: center;
+        list-style: none;
+        gap: 0;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+
+    .uppercheckout ul li {
+        padding: 0 8px;
+        color: #bbb;
+        font-size: 0.85rem;
+        font-weight: 400;
+    }
+
+    .uppercheckout ul li:nth-child(5),
+    .uppercheckout ul li:nth-child(7) {
+        color: #38728F;
+        font-weight: 700;
+    }
+
+    /* Main Grid */
+    .checkout_wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1.3fr;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+
+    /* Left: Product Section */
+    .product_card {
+        background: white;
+        border-radius: 12px;
+        padding: 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .product_header {
+        background: linear-gradient(135deg, #38728F 0%, #2a5276 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .product_header h3 {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.9;
+    }
+
+    .product_content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 20px;
+    }
+
+    .product_image_container {
+        margin-bottom: 20px;
+    }
+
+    .product_image {
+        max-width: 140px;
+        max-height: 140px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .product_info {
+        text-align: center;
+    }
+
+    .product_info h2 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #001A40;
+        margin: 0 0 8px 0;
+        line-height: 1.3;
+    }
+
+    .product_price {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #38728F;
+        margin: 0;
+    }
+
+    .product_nav {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        padding: 20px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .product_nav button {
+        width: 36px;
+        height: 36px;
+        border: 2px solid #38728F;
+        background: white;
+        color: #38728F;
+        border-radius: 50%;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product_nav button:hover {
+        background: #38728F;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .product_nav.hidden {
+        display: none !important;
+    }
+
+    /* Right: Details Section */
+    .details_wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .detail_card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .card_header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #38728F;
+    }
+
+    .card_header h3 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #001A40;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .details_grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .detail_item {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .detail_label {
+        font-size: 0.75rem;
+        color: #999;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .detail_value {
+        font-size: 0.95rem;
+        color: #001A40;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    /* Order Summary */
+    .order_items {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .order_item {
+        display: grid;
+        grid-template-columns: 1fr 60px 60px;
+        gap: 12px;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        align-items: center;
+    }
+
+    .item_name {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .item_price {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #38728F;
+        text-align: right;
+    }
+
+    .text_quantity {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: white;
+        width: fit-content;
+        margin: 0 auto;
+    }
+
+    .text_quantity input {
+        width: 30px;
+        border: none;
+        text-align: center;
+        background: transparent;
+        font-weight: 600;
+        color: #001A40;
+        padding: 4px 0;
+        font-size: 0.85rem;
+    }
+
+    .text_quantity input:focus {
+        outline: none;
+    }
+
+    .quantity-btn {
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: transparent;
+        color: #38728F;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .quantity-btn:hover {
+        background: #e8f4f8;
+    }
+
+    .quantity-form {
+        width: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .pc_build_section {
+        background: #e8f4f8;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #38728F;
+    }
+
+    .pc_build_section p {
+        margin: 4px 0;
+        font-size: 0.85rem;
+        color: #001A40;
+        line-height: 1.4;
+    }
+
+    .pc_build_section p:first-child {
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+
+    .pc_build_section.hidden {
+        display: none;
+    }
+
+    /* Footer Section */
+    .checkout_footer {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 30px;
+        align-items: center;
+    }
+
+    .total_section {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .total_label {
+        font-size: 0.75rem;
+        color: #999;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+    }
+
+    .total_amount {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #38728F;
+    }
+
+    .action_button button {
+        padding: 14px 40px;
+        background: linear-gradient(135deg, #38728F 0%, #2a5276 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .action_button button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(56, 114, 143, 0.35);
+    }
+
+    .action_button button:active {
+        transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+        .checkout_wrapper {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .checkout_footer {
+            grid-template-columns: 1fr;
+        }
+
+        .order_item {
+            grid-template-columns: 1fr 50px;
+        }
+
+        .item_price {
+            grid-column: 1 / -1;
+            text-align: left;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .checkoutpage {
+            padding: 20px 12px;
+        }
+
+        .checkout_wrapper {
+            gap: 15px;
+        }
+
+        .detail_card {
+            padding: 18px;
+        }
+
+        .detail_item {
+            grid-template-columns: 100px 1fr;
+            gap: 10px;
+        }
+
+        .product_content {
+            padding: 30px 15px;
+        }
+
+        .product_image {
+            max-width: 110px;
+            max-height: 110px;
+        }
+
+        .product_info h2 {
+            font-size: 1rem;
+        }
+
+        .product_price {
+            font-size: 1.4rem;
+        }
+
+        .checkout_footer {
+            padding: 18px;
+            gap: 15px;
+        }
+
+        .total_amount {
+            font-size: 1.5rem;
+        }
+
+        .action_button button {
+            padding: 12px 25px;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="checkoutpage">
+    <div class="checkout_container">
+        <!-- Breadcrumb -->
+        <div class="uppercheckout">
+            <a href="{% url 'appointment' %}">← Back</a>
+            <ul>
+                <li>Cart</li>
+                <li>></li>
+                <li>Appointment</li>
+                <li>></li>
+                <li>Checkout</li>
+                <li>></li>
+                <li>Complete</li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="checkout_wrapper">
+            <!-- Left: Product Card -->
+            <div class="product_card">
+                <div class="product_header">
+                    <h3>Order Summary</h3>
+                </div>
+                <div class="product_content">
+                    <div class="product_image_container">
+                        {% for produkto in cart_products %}
+                            {% if forloop.first %}
+                                {% if produkto.image %}
+                                    <img src="{{ produkto.image }}" class="product_image" alt="{{ produkto.product_name }}">
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="product_info">
+                        {% for produkto in cart_products %}
+                            {% if forloop.first %}
+                                <h2>{{ produkto.product_name }}</h2>
+                                <p class="product_price">₱{{ produkto.price|floatformat:2|intcomma }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if cart_products|length > 1 %}
+                <div class="product_nav">
+                    <button id="prevBtn">&lt;</button>
+                    <button id="nextBtn">&gt;</button>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Right: Details -->
+            <div class="details_wrapper">
+                <!-- Appointment Details -->
+                <div class="detail_card">
+                    <div class="card_header">
+                        <h3>📋 Appointment Details</h3>
+                    </div>
+                    <div class="details_grid">
+                        <div class="detail_item">
+                            <span class="detail_label">Full Name</span>
+                            <span class="detail_value">{{ appointment_datas.first_name }} {{ appointment_datas.last_name }}</span>
+                        </div>
+                        <div class="detail_item">
+                            <span class="detail_label">Contact</span>
+                            <span class="detail_value">{{ appointment_datas.contact }}</span>
+                        </div>
+                        <div class="detail_item">
+                            <span class="detail_label">Email</span>
+                            <span class="detail_value">{{ appointment_datas.email }}</span>
+                        </div>
+                        <div class="detail_item">
+                            <span class="detail_label">Date & Time</span>
+                            <span class="detail_value">{{ appointment_datas.date }} / {{ appointment_datas.time }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items Card -->
+                <div class="detail_card">
+                    <div class="card_header">
+                        <h3>🛒 Items</h3>
+                    </div>
+
+                    {% if request.session.cart %}
+                        {% for item in request.session.cart %}
+                            {% if item.type == "pc_build" %}
+                                <script id="pc-build-data" type="application/json">{{ item.build_data|safe }}</script>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    <div id="pc-build-summary" class="pc_build_section hidden">
+                        <p>Custom PC Build</p>
+                        <div id="build-components"></div>
+                        <p id="build-total"></p>
+                    </div>
+
+                    <div class="order_items">
+                        {% for produkto in cart_products %}
+                        <div class="order_item">
+                            <span class="item_name">{{ produkto.product_name }}</span>
+                            {% if not is_direct %}
+                            <form action="{% url 'update_cart' produkto.product_id %}" method="POST" class="quantity-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="cart_key" value="{{ produkto.cart_key }}">
+                                <div class="text_quantity">
+                                    <button class="quantity-btn" type="submit" name="action" value="decrease">−</button>
+                                    <input type="number" value="{{ produkto.quantity }}" min="1" readonly>
+                                    <button class="quantity-btn" type="submit" name="action" value="increase">+</button>
+                                </div>
+                            </form>
+                            {% else %}
+                            <form action="{% url 'update_direct_checkout' %}" method="POST" class="quantity-form">
+                                {% csrf_token %}
+                                <div class="text_quantity">
+                                    <button class="quantity-btn" type="submit" name="action" value="decrease">−</button>
+                                    <input type="number" value="{{ produkto.quantity }}" min="1" readonly>
+                                    <button class="quantity-btn" type="submit" name="action" value="increase">+</button>
+                                </div>
+                            </form>
+                            {% endif %}
+                            <span class="item_price">₱{{ produkto.sub_total|floatformat:2|intcomma }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="checkout_footer">
+            <div class="total_section">
+                <span class="total_label">Total Amount</span>
+                <span class="total_amount">₱{{ total_price|floatformat:2|intcomma }}</span>
+            </div>
+            <div class="action_button">
+                <form action="{% url 'appointment_complete' %}" method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit">Confirm Appointment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const productCount = {{ cart_products|length }};
+    if (productCount <= 1) return;
+
+    const slides = [];
+    {% for produkto in cart_products %}
+    slides.push({
+        name: "{{ produkto.product_name }}",
+        price: "{{ produkto.price|floatformat:2|intcomma }}",
+        image: "{{ produkto.image }}"
+    });
+    {% endfor %}
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const productImage = document.querySelector('.product_image');
+    const productName = document.querySelector('.product_info h2');
+    const productPrice = document.querySelector('.product_price');
+
+    let currentIndex = 0;
+
+    function updateDisplay() {
+        if (slides[currentIndex]) {
+            productName.textContent = slides[currentIndex].name;
+            productPrice.textContent = '₱' + slides[currentIndex].price;
+            if (productImage && slides[currentIndex].image) {
+                productImage.src = slides[currentIndex].image;
+            }
+        }
+    }
+
+    prevBtn.addEventListener("click", function () {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        updateDisplay();
+    });
+
+    nextBtn.addEventListener("click", function () {
+        currentIndex = (currentIndex + 1) % slides.length;
+        updateDisplay();
+    });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const dataTag = document.getElementById("pc-build-data");
+    if (!dataTag) return;
+
+    const build = JSON.parse(dataTag.textContent);
+    const summaryBox = document.getElementById("pc-build-summary");
+    const container = document.getElementById("build-components");
+    const totalEl = document.getElementById("build-total");
+
+    summaryBox.classList.remove('hidden');
+
+    let total = 0;
+
+    for (const [type, comp] of Object.entries(build)) {
+        if (type === "total") continue;
+
+        const row = document.createElement("p");
+        row.innerHTML = `<strong>${type.toUpperCase()}:</strong> ${comp.name} — ₱${comp.price.toLocaleString()}`;
+        container.appendChild(row);
+
+        total += comp.price;
+    }
+
+    totalEl.textContent = "Total PC Build: ₱" + total.toLocaleString();
+});
+</script>
+
+{% endblock content %}

@@ -1,0 +1,802 @@
+{% extends 'app/navigation.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  
+  .profilepage {
+    padding: 30px 20px 1000px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+  }
+
+  .profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .profile-header {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 30px;
+    align-items: start;
+  }
+
+  .profile-avatar {
+    text-align: center;
+  }
+
+  .avatar-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border: 2px solid #0b84c6;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(11, 132, 198, 0.2);
+  }
+
+  .profile-header-content h1 {
+    font-size: 28px;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+  }
+
+  .profile-header-content p {
+    color: #666;
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .profile-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  .profile-form-section {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.3s ease;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #0b84c6;
+    box-shadow: 0 0 0 3px rgba(11, 132, 198, 0.1);
+  }
+
+  .form-group input:disabled {
+    background: #f5f5f5;
+    color: #666;
+    cursor: not-allowed;
+  }
+
+  /* Password input wrapper with toggle button */
+  .password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .password-input-wrapper input {
+    flex: 1;
+    padding-right: 45px;
+  }
+
+  .toggle-password-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #0b84c6;
+    font-size: 18px;
+    padding: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .toggle-password-btn:hover {
+    color: #0a6fa3;
+    transform: scale(1.1);
+  }
+
+  .toggle-password-btn:active {
+    transform: scale(0.95);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .form-group.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px solid #f0f0f0;
+  }
+
+  .button-group button {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #0b84c6 0%, #0591d8 100%);
+    color: white;
+    flex: 1;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #0871b0 0%, #047ec4 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(11, 132, 198, 0.3);
+  }
+
+  .btn-secondary {
+    background: #f0f0f0;
+    color: #333;
+    flex: 1;
+  }
+
+  .btn-secondary:hover {
+    background: #e0e0e0;
+  }
+
+  .alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    border-left: 4px solid;
+  }
+
+  .alert-success {
+    background: #d4edda;
+    color: #155724;
+    border-color: #28a745;
+    border: 1px solid #c3e6cb;
+    border-left: 4px solid #28a745;
+  }
+
+  .alert-success strong {
+    color: #0d3622;
+  }
+
+  .alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border-color: #dc3545;
+    border: 1px solid #f5c6cb;
+    border-left: 4px solid #dc3545;
+  }
+
+  .alert-error strong {
+    color: #5a1419;
+  }
+
+  .alert ul {
+    margin-top: 10px;
+    margin-bottom: 0;
+    padding-left: 20px;
+  }
+
+  .alert li {
+    margin-bottom: 5px;
+  }
+
+  /* Tablet (768px and below) */
+  @media (max-width: 768px) {
+    .profilepage {
+      padding: 30px 15px 120px;
+    }
+
+    .profile-container {
+      max-width: 100%;
+    }
+
+    .profile-header {
+      grid-template-columns: 1fr;
+      padding: 30px 20px;
+      gap: 20px;
+      text-align: center;
+    }
+
+    .profile-avatar {
+      margin-bottom: 10px;
+    }
+
+    .avatar-image {
+      width: 120px;
+      height: 120px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 50%;
+    }
+
+    .profile-sections {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .profile-form-section {
+      padding: 30px 20px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin-bottom: 25px;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    .button-group {
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 25px;
+      padding-top: 25px;
+    }
+
+    .button-group button {
+      width: 100%;
+      padding: 11px 20px;
+      font-size: 13px;
+    }
+  }
+
+  /* Mobile (480px and below) */
+  @media (max-width: 480px) {
+    .profilepage {
+      padding: 30px 12px 120px;
+    }
+
+    .profile-header {
+      padding: 25px 15px;
+      gap: 15px;
+    }
+
+    .profile-header-content h1 {
+      font-size: 22px;
+      margin-bottom: 5px;
+    }
+
+    .profile-header-content p {
+      font-size: 13px;
+    }
+
+    .avatar-image {
+      width: 100px;
+      border-radius: 50%;
+      height: 100px;
+    }
+
+    .profile-form-section {
+      padding: 20px 15px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    .form-grid {
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      padding: 10px 12px;
+      font-size: 13px;
+      border-radius: 6px;
+    }
+
+    .button-group {
+      margin-top: 20px;
+      padding-top: 20px;
+      gap: 8px;
+      flex-direction: column;
+    }
+
+    .button-group button {
+      padding: 10px 16px;
+      font-size: 12px;
+      border-radius: 6px;
+      width: 100%;
+    }
+  }
+
+  /* Extra small (320px and below) */
+  @media (max-width: 320px) {
+    .profilepage {
+      padding: 30px 10px 100px;
+    }
+
+    .profile-header {
+      padding: 20px 12px;
+      gap: 12px;
+    }
+
+    .profile-header-content h1 {
+      font-size: 18px;
+    }
+
+    .avatar-image {
+      width: 90px;
+      border-radius: 50%;
+      height: 90px;
+    }
+
+    .profile-form-section {
+      padding: 18px 12px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      font-size: 12px;
+    }
+  }
+</style>
+
+<div class="profilepage">
+  <div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <img id="profileHeaderAvatar" src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'images/icon/user_default.png' %}{% endif %}" alt="User Avatar" class="avatar-image" style="cursor: pointer;">
+        <p style="font-size: 12px; color: #666; margin-top: 8px; text-align: center; cursor: pointer;" id="editAvatarText">Click to edit</p>
+      </div>
+      <div class="profile-header-content">
+        <h1>{{ user.first_name|default:user.username }}</h1>
+        <p>{{ user.email }}</p>
+      </div>
+    </div>
+
+    <!-- Separate Avatar Upload Form (OUTSIDE profile form) -->
+    <form method="POST" enctype="multipart/form-data" id="avatarForm" style="display: none;">
+      {% csrf_token %}
+      <input type="file" id="headerAvatarInput" name="avatar" accept="image/*">
+    </form>
+
+    <!-- Profile Sections (Two Column) -->
+    <div class="profile-sections">
+      <!-- Edit Profile Section -->
+      <div class="profile-form-section">
+        <h2 class="section-title">Edit Profile</h2>
+        
+        <form method="POST" enctype="multipart/form-data" id="profileForm">
+          {% csrf_token %}
+          <div class="form-grid">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="id_first_name">First Name</label>
+                <input type="text" id="id_first_name" name="first_name" value="{{ user.first_name }}" disabled>
+              </div>
+
+              <div class="form-group">
+                <label for="id_last_name">Last Name</label>
+                <input type="text" id="id_last_name" name="last_name" value="{{ user.last_name }}" disabled>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="id_contact">Contact Number</label>
+                <input type="tel" id="id_contact" name="contact" value="{{ user.contact }}" disabled>
+              </div>
+
+              <div class="form-group">
+                <label for="id_address">Address</label>
+                <input type="text" id="id_address" name="address" value="{{ user.address }}" disabled>
+              </div>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button id="editBtn" type="button" class="btn-primary">Edit Profile</button>
+            <button id="updateBtn" type="submit" name="save_profile" class="btn-primary" style="display:none;">Save Changes</button>
+            <button id="cancelBtn" type="button" class="btn-secondary" style="display:none;">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Change Password Section -->
+      <div class="profile-form-section">
+        <h2 class="section-title">Change Password</h2>
+        
+        <form method="POST" enctype="multipart/form-data" id="passwordForm">
+          {% csrf_token %}
+          <div class="form-grid">
+            <div class="form-group password-field">
+              <label for="id_old_password">Current Password</label>
+              <div class="password-input-wrapper">
+                <input type="password" id="id_old_password" name="old_password" required>
+                <button type="button" class="toggle-password-btn" data-target="id_old_password">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group password-field">
+              <label for="id_new_password1">New Password</label>
+              <div class="password-input-wrapper">
+                <input type="password" id="id_new_password1" name="new_password1" required>
+                <button type="button" class="toggle-password-btn" data-target="id_new_password1">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group password-field">
+              <label for="id_new_password2">Confirm Password</label>
+              <div class="password-input-wrapper">
+                <input type="password" id="id_new_password2" name="new_password2" required>
+                <button type="button" class="toggle-password-btn" data-target="id_new_password2">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button type="submit" name="change_password" class="btn-primary">Update Password</button>
+          </div>
+        </form>
+        
+        <!-- Password Change Messages -->
+        <div id="passwordMessages"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== PASSWORD SHOW/HIDE TOGGLE =====
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggleButtons = document.querySelectorAll('.toggle-password-btn');
+    
+    toggleButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        const icon = this.querySelector('i');
+        
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          input.type = 'password';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      });
+    });
+  });
+
+  // ===== AVATAR CLICK HANDLER =====
+  const profileHeaderAvatar = document.getElementById('profileHeaderAvatar');
+  const headerAvatarInput = document.getElementById('headerAvatarInput');
+  const editAvatarText = document.getElementById('editAvatarText');
+  const avatarForm = document.getElementById('avatarForm');
+  const profileForm = document.getElementById('profileForm');
+
+  // Click handlers to open file picker
+  profileHeaderAvatar.addEventListener('click', () => {
+    headerAvatarInput.click();
+  });
+
+  editAvatarText.addEventListener('click', () => {
+    headerAvatarInput.click();
+  });
+
+  // Avatar file input change
+  headerAvatarInput.addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size exceeds 5MB. Please choose a smaller image.');
+        headerAvatarInput.value = '';
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file.');
+        headerAvatarInput.value = '';
+        return;
+      }
+
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        profileHeaderAvatar.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+
+      // Create FormData from the separate avatar form
+      const avatarFormData = new FormData(avatarForm);
+      
+      fetch("{% url 'profile' %}", {
+        method: 'POST',
+        body: avatarFormData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Network response error');
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          alert('Profile picture updated successfully!');
+          location.reload();
+        } else {
+          alert('Error updating profile picture. Please try again.');
+          console.log('Form errors:', data.errors || 'Unknown error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating profile picture. Please try again.');
+      });
+    }
+  });
+
+  // ===== PROFILE FORM HANDLING =====
+  const editBtn = document.getElementById('editBtn');
+  const updateBtn = document.getElementById('updateBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const formInputs = profileForm.querySelectorAll('input[type="text"], input[type="tel"]');
+
+  // Store original values
+  const originalValues = {};
+  formInputs.forEach(input => {
+    originalValues[input.id] = input.value;
+  });
+
+  editBtn.addEventListener('click', () => {
+    // Enable all inputs
+    formInputs.forEach(input => {
+      input.disabled = false;
+    });
+    editBtn.style.display = 'none';
+    updateBtn.style.display = 'inline-block';
+    cancelBtn.style.display = 'inline-block';
+  });
+
+  cancelBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    // Disable all inputs and restore original values
+    formInputs.forEach(input => {
+      input.disabled = true;
+      input.value = originalValues[input.id];
+    });
+    updateBtn.style.display = 'none';
+    cancelBtn.style.display = 'none';
+    editBtn.style.display = 'inline-block';
+  });
+
+  // Profile form submission
+  profileForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    
+    const formData = new FormData(profileForm);
+    formData.append('save_profile', 'true');
+    
+    fetch("{% url 'profile' %}", {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response error');
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        alert('Profile updated successfully!');
+        location.reload();
+      } else {
+        alert('Error updating profile. Please check your inputs.');
+        console.log('Form errors:', data.errors || 'Unknown error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      const fallbackForm = new FormData(profileForm);
+      fetch("{% url 'profile' %}", {
+        method: 'POST',
+        body: fallbackForm
+      })
+      .then(response => {
+        if (response.ok) location.reload();
+      })
+      .catch(e => console.error('Fallback error:', e));
+    });
+  });
+
+  // ===== PASSWORD FORM HANDLING =====
+  const passwordForm = document.getElementById('passwordForm');
+  const passwordMessages = document.getElementById('passwordMessages');
+  
+  // Helper function to display messages
+  function showPasswordMessage(type, message, errors = null) {
+    let messageHTML = `<div class="alert alert-${type}">`;
+    messageHTML += `<strong>${type === 'success' ? 'Success!' : 'Error!'}</strong> ${message}`;
+    
+    if (errors && typeof errors === 'object') {
+      messageHTML += '<ul style="margin-top: 10px; margin-bottom: 0; padding-left: 20px;">';
+      for (const [field, fieldErrors] of Object.entries(errors)) {
+        if (Array.isArray(fieldErrors)) {
+          fieldErrors.forEach(error => {
+            messageHTML += `<li>${field}: ${error}</li>`;
+          });
+        } else {
+          messageHTML += `<li>${field}: ${fieldErrors}</li>`;
+        }
+      }
+      messageHTML += '</ul>';
+    }
+    
+    messageHTML += '</div>';
+    passwordMessages.innerHTML = messageHTML;
+  }
+  
+  passwordForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    
+    // Clear previous messages
+    passwordMessages.innerHTML = '';
+    
+    const formData = new FormData(passwordForm);
+    formData.append('change_password', 'true');
+    
+    fetch("{% url 'profile' %}", {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => {
+      // Check content type before parsing
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return response.json();
+      } else {
+        throw new Error('Invalid response format');
+      }
+    })
+    .then(data => {
+      if (data.success) {
+        showPasswordMessage('success', data.message || 'Password updated successfully!');
+        passwordForm.reset();
+        
+        // Clear all password fields
+        document.getElementById('id_old_password').value = '';
+        document.getElementById('id_new_password1').value = '';
+        document.getElementById('id_new_password2').value = '';
+        
+        // Reset password field icons back to eye
+        document.querySelectorAll('.password-field .toggle-password-btn i').forEach(icon => {
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        });
+        
+        // Auto-hide message after 5 seconds
+        setTimeout(() => {
+          passwordMessages.innerHTML = '';
+        }, 5000);
+      } else {
+        showPasswordMessage('error', data.message || 'Error updating password', data.errors);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showPasswordMessage('error', 'Network error. Please try again.');
+    });
+  });
+</script>
+{% endblock content %}

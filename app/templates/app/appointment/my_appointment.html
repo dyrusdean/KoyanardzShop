@@ -1,0 +1,652 @@
+{% extends 'app/navigation.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .appointment-page {
+        background: #f8f9fa;
+        min-height: 100vh;
+        padding: 30px 20px;
+    }
+
+    .appointment-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 30px;
+    }
+
+    .appointment-sidebar {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        height: fit-content;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        position: sticky;
+        top: 20px;
+    }
+
+    .appointment-sidebar h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .appointment-nav ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .appointment-nav li a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 15px;
+        color: #666;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .appointment-nav li a:hover,
+    .appointment-nav li a.active {
+        background: #0b7aa3;
+        color: white;
+    }
+
+    .appointment-nav img {
+        width: 18px;
+        height: 18px;
+        opacity: 0.8;
+    }
+
+    .appointment-main {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .appointment-header {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .appointment-header h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 20px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        border: 1px solid #e0e0e0;
+    }
+
+    .stat-card label {
+        display: block;
+        font-size: 13px;
+        color: #666;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .stat-card p {
+        font-size: 24px;
+        font-weight: 700;
+        color: #0b7aa3;
+    }
+
+    .appointments-list {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .appointments-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .appointments-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .appointments-list::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 10px;
+    }
+
+    .appointments-list::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+
+    .appointments-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .appointments-table thead {
+        background: #f8f9fa;
+        border-bottom: 2px solid #e8e8e8;
+    }
+
+    .appointments-table th {
+        padding: 16px 20px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 13px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .appointments-table tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.2s ease;
+    }
+
+    .appointments-table tbody tr:hover {
+        background: #fafafa;
+    }
+
+    .appointments-table td {
+        padding: 16px 20px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .appointment-col-img {
+        width: 50px;
+    }
+
+    .appointment-img {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .appointment-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 6px;
+    }
+
+    .appointment-col-title {
+        flex: 1;
+    }
+
+    .appointment-title {
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+    }
+
+    .appointment-category {
+        font-size: 12px;
+        color: #999;
+    }
+
+    .appointment-col-date {
+        white-space: nowrap;
+        color: #666;
+        font-size: 13px;
+    }
+
+    .appointment-col-price {
+        font-weight: 600;
+        color: #0b7aa3;
+        white-space: nowrap;
+    }
+
+    .appointment-col-status {
+        text-align: center;
+    }
+
+    .appointment-status {
+        background: #ffd700;
+        color: #333;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 12px;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .appointment-status.pending {
+        background: #ffd700;
+        color: #333;
+    }
+
+    .appointment-status.completed {
+        background: #27ae60;
+        color: white;
+    }
+
+    .appointment-status.cancelled {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .appointment-status.selling {
+        background: #ff9800;
+        color: white;
+    }
+
+    .appointment-col-ref {
+        font-size: 12px;
+        color: #999;
+        white-space: nowrap;
+    }
+
+    .empty-state {
+        background: white;
+        border-radius: 12px;
+        padding: 60px 20px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .empty-state p {
+        font-size: 16px;
+        color: #999;
+        margin-bottom: 20px;
+    }
+
+    .empty-state a {
+        display: inline-block;
+        background: #0b7aa3;
+        color: white;
+        padding: 12px 28px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .empty-state a:hover {
+        background: #095a85;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 1024px) {
+        .appointment-container {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .appointment-sidebar {
+            position: static;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .appointment-container {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .appointment-sidebar {
+            position: static;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .appointments-table {
+            display: block;
+            width: 100%;
+        }
+
+        .appointments-table thead {
+            display: none;
+        }
+
+        .appointments-table tbody {
+            display: block;
+        }
+
+        .appointments-table tbody tr {
+            display: block;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .appointments-table tbody tr:hover {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .appointments-table td {
+            display: block;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .appointments-table td:last-child {
+            border-bottom: none;
+        }
+
+        .appointments-table td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: #666;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .appointment-col-img {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .appointment-col-img::before {
+            display: none;
+        }
+
+        .appointment-img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .appointment-col-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .appointment-col-title::before {
+            display: none;
+        }
+
+        .appointment-details-wrapper {
+            flex: 1;
+        }
+
+        .appointment-title {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .appointment-category {
+            font-size: 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .appointment-page {
+            padding: 15px 10px;
+        }
+
+        .appointment-sidebar {
+            position: static;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: none;
+            height: auto;
+        }
+
+        .appointment-sidebar h3 {
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .appointment-nav ul {
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .appointment-nav li {
+            flex: 1;
+            min-width: 45%;
+        }
+
+        .appointment-nav li a {
+            padding: 8px 10px;
+            font-size: 12px;
+            flex-direction: column;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .appointment-nav img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .appointment-container {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .appointment-header {
+            padding: 15px;
+        }
+
+        .appointment-header h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .appointments-list {
+            overflow: visible;
+            max-height: none;
+        }
+
+        .appointments-table tbody tr {
+            display: block;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .appointments-table tbody tr:hover {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .appointments-table td {
+            display: block;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 12px;
+        }
+
+        .appointments-table td:last-child {
+            border-bottom: none;
+        }
+
+        .appointments-table td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: #666;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 10px;
+        }
+
+        .appointment-col-img {
+            width: 100%;
+        }
+
+        .appointment-col-img::before {
+            display: none;
+        }
+
+        .appointment-img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .appointment-title {
+            font-size: 13px;
+        }
+
+        .appointment-category {
+            font-size: 11px;
+        }
+
+        .stat-card {
+            padding: 12px;
+        }
+
+        .stat-card label {
+            font-size: 12px;
+        }
+
+        .stat-card p {
+            font-size: 18px;
+        }
+    }
+</style>
+
+<div class="appointment-page">
+    <div class="appointment-container">
+        <!-- Sidebar Navigation -->
+        <aside class="appointment-sidebar">
+            <h3>My Appointments</h3>
+            <nav class="appointment-nav">
+                <ul>
+                    <li><a href="{% url 'my_appointment' %}" class="active"><img src="{% static 'images/icon/pending.png' %}" alt="">Product Viewing</a></li>
+                    <li><a href="{% url 'my_sellingappointment' %}"><img src="{% static 'images/icon/trading.png' %}" alt="">Selling Device</a></li>
+                    <li><a href="{% url 'my_cancelledappointment' %}"><img src="{% static 'images/icon/cancel.png' %}" alt="">Cancelled</a></li>
+                    <li><a href="{% url 'my_historyappointment' %}"><img src="{% static 'images/icon/history.png' %}" alt="">History</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="appointment-main">
+            <!-- Header with Stats -->
+            <div class="appointment-header">
+                <h2>📅 Product Viewing Appointments</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <label>All Appointments</label>
+                        <p>{{ count_all }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <label>Pending</label>
+                        <p>{{ count_pending }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <label>Completed</label>
+                        <p>{{ count_completed }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <label>Cancelled</label>
+                        <p>{{ count_cancelled }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointments List -->
+            {% if user.is_authenticated %}
+                {% if appointments %}
+                <div class="appointments-list">
+                    <table class="appointments-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Product</th>
+                                <th>Date & Time</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in appointments %}
+                                {% for produkto in appointment.products.all %}
+                                <tr>
+                                    <td class="appointment-col-img" data-label="">
+                                        <div class="appointment-img">
+                                            {% if produkto.product.image %}
+                                                <img src="{{ produkto.product.image.url }}" alt="{{ produkto.product.product_name }}">
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="appointment-col-title" data-label="Product">
+                                        <div class="appointment-title">{{ produkto.product.product_name }}</div>
+                                        <div class="appointment-category">Product Viewing</div>
+                                    </td>
+                                    <td class="appointment-col-date" data-label="Date & Time">
+                                        {{ appointment.date|date:"M d, Y" }}<br>{{ appointment.time|time:"h:i A" }}
+                                    </td>
+                                    <td class="appointment-col-price" data-label="Price">₱{{ produkto.price|intcomma }}</td>
+                                    <td class="appointment-col-status" data-label="Status">
+                                        <span class="appointment-status pending">{{ appointment.status }}</span>
+                                    </td>
+                                    <td class="appointment-col-ref" data-label="Reference">{{ appointment.reference_number }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <p>📭 No appointments found</p>
+                    <a href="{% url 'product' %}">Browse Products</a>
+                </div>
+                {% endif %}
+            {% else %}
+            <div class="empty-state">
+                <p>You need to log in to view your appointments</p>
+                <a href="{% url 'login' %}">Login Now</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

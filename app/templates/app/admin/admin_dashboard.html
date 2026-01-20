@@ -1,0 +1,270 @@
+{% extends 'app/admin/admin_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="admin_productpage">
+    <div class="product-header">
+        <h2>Dashboard</h2>
+    </div>
+
+    <div class="card mt-3" style="background-color: #033f63;">
+    <div class="card-content">
+        <div class="row row-group m-0">
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+                <div class="card-body">
+                  <h5 class="text-white mb-0">9526 <span class="float-right"><i class="fa-solid fa-shopping-cart"></i></span></h5>
+                    <div class="progress my-3" style="height:3px;">
+                       <div class="progress-bar" style="width:55%"></div>
+                    </div>
+                  <p class="mb-0 text-white small-font" style="font-size: 1.1rem;">Total Orders</p>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light" style="background-color: #1E88E5;">
+                <div class="card-body">
+                  <h5 class="text-white mb-0">₱{{ total_sales|intcomma }}<span class="float-right"><i class="fa-solid fa-dollar-sign"></i></span></h5>
+                    <div class="progress my-3" style="height:3px;">
+                       <div class="progress-bar" style="width:55%"></div>
+                    </div>
+                  <p class="mb-0 text-white small-font" style="font-size: 1.1rem;">Total Sales</p>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light">
+                <div class="card-body">
+                  <h5 class="text-white mb-0">{{ appointed }} <span class="float-right"><i class="zmdi zmdi-calendar-check"></i></span></h5>
+                    <div class="progress my-3" style="height:3px;">
+                       <div class="progress-bar" style="width:55%"></div>
+                    </div>
+                  <a class="mb-0 text-white small-font" href="{% url 'admin_appointment' %}" style="font-size: 1.1rem;">Pending Appointment</a>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-3 border-light" style="background-color: #1E88E5;">
+                <div class="card-body">
+                  <h5 class="text-white mb-0">{{ traded }}<span class="float-right"><i class="zmdi zmdi-calendar-check"></i></span></h5>
+                    <div class="progress my-3" style="height:3px;">
+                       <div class="progress-bar" style="width:55%"></div>
+                    </div>
+                  <a class="mb-0 text-white small-font" href="{% url 'admin_selling' %}" style="font-size: 1.1rem;">Pending Trade</a>
+                </div>
+            </div>
+        </div>
+    </div>
+ </div>  
+	  
+	<div class="row">
+     <div class="col-12 col-lg-8 col-xl-8">
+	    <div class="card">
+		 <div class="card-header" style="font-size: 1.1rem;">Sales
+		 </div>
+		 <div class="card-body">
+		    <ul class="list-inline">
+			  <li class="list-inline-item"><i class="fa-solid fa-circle mr-2 text-white"></i>Appointment</li>
+			  <li class="list-inline-item"><i class="fa-solid fa-circle mr-2 text-light"></i>Trade</li>
+			</ul>
+			<div class="chart-container-1">
+			  <canvas id="chart1" style="color: black !important;"></canvas>
+			</div>
+		 </div>
+		 
+		 <div class="row m-0 row-group text-center border border-light-3">
+		   <div class="col-12 col-lg-4">
+		     <div class="p-3">
+		       <h5 class="mb-0" style="font-size: 1.2rem; color: black;">{{ total_appointments }}</h5>
+			   <small class="mb-0" style="font-size: 1rem;">Total Appointment</small>
+		     </div>
+		   </div>
+		   <div class="col-12 col-lg-4">
+		     <div class="p-3">
+		       <h5 class="mb-0"></h5>
+			   <small class="mb-0"></small>
+		     </div>
+		   </div>
+		   <div class="col-12 col-lg-4">
+		     <div class="p-3">
+		       <h5 class="mb-0" style="font-size: 1.2rem; color: black;">{{ total_trades }}</h5>
+			   <small class="mb-0" style="font-size: 1rem;">Total Trades</small>
+		     </div>
+		   </div>
+		 </div>
+		</div>
+	 </div>
+
+     <div class="col-12 col-lg-4 col-xl-4">
+        <div class="card">
+           <div class="card-header">Top Categories</div>
+           <div class="card-body">
+		     <div class="chart-container-2">
+            <canvas id="chart2"></canvas>
+			    </div>
+           </div>
+           <div class="dashboard-legend">
+             {% for c in category_list %}
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: 
+                        {% if forloop.counter == 1 %}#f79256
+                        {% elif forloop.counter == 2 %}#fbd1a2
+                        {% elif forloop.counter == 3 %}#7dcfb6
+                        {% elif forloop.counter == 4 %}#00b2ca
+                        {% elif forloop.counter == 5 %}#1d4e89
+                        {% else %}#999
+                        {% endif %}"></div>
+                    <span class="legend-label">{{ c.category_name }}: {{ c.total_sold }}</span>
+                </div>
+             {% endfor %}
+           </div>
+         </div>
+     </div>
+	</div>
+  
+	<div class="row" id="dashboard_tabledata">
+	 <div class="col-12 col-lg-12">
+	   <div class="products-table-container">
+	     <div class="table-wrapper">
+                 <table class="products-table">
+    <thead>
+        <tr>
+          <th>Type</th>
+          <th>Photo</th>
+          <th>Product</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Reference No.</th>
+          <th>Progress</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if all_orders %}
+            {% for order in all_orders %}
+            <tr>
+                <td data-label="Type">{{ order.type }}</td>
+                <td data-label="Photo">
+                  {% if order.photo %}
+                    <img src="{{ order.photo }}" alt="product img" class="product-thumbnail" style="width: 50px; height: 50px;">
+                  {% endif %}
+                </td>
+                <td data-label="Product" class="product-name" style="max-width: 10rem; overflow: hidden;">{{ order.product }}</td>
+                <td data-label="Amount" class="price-column">₱{{ order.amount|intcomma }}</td>
+                <td data-label="Date">{{ order.date|date:"M d, Y H:i" }}</td>
+                <td data-label="Reference">{{ order.product_id }}</td>
+                <td data-label="Progress">
+                    <div class="progress shadow" style="height: 3px;">
+                        <div class="progress-bar" role="progressbar" style="width: {{ order.shipping_progress }}%"></div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="7" class="no-data">No orders found</td></tr>
+        {% endif %}
+    </tbody>
+</table>
+	     </div>
+	   </div>
+	 </div>
+	</div>
+</div>
+
+<script>
+$(function() {
+    "use strict";
+
+    // chart 1
+    var ctx1 = document.getElementById('chart1').getContext('2d');
+    var myChart1 = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: 'Appointment',
+                data: {{ appointment_chart_data|safe }},
+                backgroundColor: '#033f63',
+                borderColor: "#033f63",
+                pointRadius :"0",
+                borderWidth: 3
+            }, {
+                label: 'Trade',
+                data: {{ selling_chart_data|safe }},
+                backgroundColor: "#1E88E5",
+                borderColor: "#1E88E5",
+                pointRadius :"0",
+                borderWidth: 2
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            labels: {
+              // legend text color and size
+              color: 'whitesmoke',
+              font: {
+                size: 13
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#ddd' }
+          },
+          y: {
+            ticks: { color: '#ddd' }
+          }
+        }
+        }
+    });
+
+    var ctx2 = document.getElementById("chart2").getContext('2d');
+
+    var bgColors = [
+        "#f79256",
+        "#fbd1a2",
+        "#7dcfb6",   
+        "#00b2ca",    
+        "#1d4e89"   
+    ];
+
+    var myChart2 = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: {{ category_labels|safe }},
+            datasets: [{
+                backgroundColor: bgColors.slice(0, {{ category_data|length }}),
+                data: {{ category_data|safe }},
+                borderWidth: 1,
+                borderColor: "#222"
+            }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'left',
+            labels: {
+              // move legend labels to the left side styling
+              color: '#ffffff',
+              font: {
+                size: 13
+              }
+            }
+          }
+        },
+        layout: {
+          padding: {
+            left: 10,
+            right: 10,
+            top: 10,
+            bottom: 10
+          }
+        }
+        }
+    });
+
+});
+</script>
+
+{% endblock %}

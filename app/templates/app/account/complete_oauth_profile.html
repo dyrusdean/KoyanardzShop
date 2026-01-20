@@ -1,0 +1,84 @@
+{% extends 'app/navigation.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    /* Hide global header/navigation and footer for the oauth profile completion page */
+    header, nav, .navbar, .site-header, .topbar, .main-nav, .navigation, .header, .site-navigation,
+    footer, .site-footer, .page-footer, .footer, .footer-wrapper, .bottom-footer { display: none !important; }
+    
+    /* Home button */
+    .oauth-complete-home-btn{ position: fixed; left: 14px; top: 14px; z-index: 1200; background: #fff; color:#222; padding:8px 12px; border-radius:8px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); text-decoration:none; display:flex; align-items:center; gap:8px; font-weight:600 }
+    
+    .oauth_complete_page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; }
+    
+    .oauth_complete_container { background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 500px; width: 100%; padding: 40px; }
+    
+    .oauth_complete_container h2 { color: #333; margin-bottom: 10px; font-size: 28px; text-align: center; }
+    .oauth_complete_container p { color: #666; text-align: center; margin-bottom: 30px; font-size: 14px; }
+    
+    .oauth_form_group { margin-bottom: 20px; }
+    .oauth_form_group label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
+    .oauth_form_group input,
+    .oauth_form_group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+    .oauth_form_group input:focus,
+    .oauth_form_group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+    
+    .oauth_form_group textarea { resize: vertical; min-height: 100px; }
+    
+    .oauth_submit_btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
+    .oauth_submit_btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+    
+    .errorlist { list-style: none; padding: 0; margin: 0.5rem 0; }
+    .errorlist li { background-color: #fee; color: #c33; padding: 0.6rem 0.8rem; border-radius: 0.4rem; border-left: 4px solid #c33; margin-bottom: 0.4rem; font-size: 0.9rem; }
+    
+    .oauth_form_group small { display: block; color: #c33; font-size: 0.85rem; margin-top: 0.3rem; padding: 0.4rem 0.6rem; background-color: #fee; border-radius: 0.3rem; border-left: 3px solid #c33; }
+    
+    @media (max-width: 768px) {
+        .oauth-complete-home-btn { left: 10px; top: 10px; padding: 6px 10px; font-size: 0.85rem; }
+        .oauth_complete_container { padding: 30px 20px; }
+        .oauth_complete_container h2 { font-size: 24px; }
+    }
+</style>
+
+<a class="oauth-complete-home-btn" href="{% url 'home' %}"><i class="fa-solid fa-home"></i> Home</a>
+
+<div class="oauth_complete_page">
+    <div class="oauth_complete_container">
+        <h2>Welcome to Koya Nardz Shop!</h2>
+        <p>Please complete your profile to finish setting up your account.</p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            {% for field in profile_form %}
+                {% if field.name != 'email' and field.name != 'username' %}
+                <div class="oauth_form_group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <small>
+                            {% for error in field.errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        </small>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+            
+            <button type="submit" class="oauth_submit_btn">Complete Profile</button>
+        </form>
+        
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock content %}

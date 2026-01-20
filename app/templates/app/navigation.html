@@ -1,0 +1,713 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Koya Nardz Computer Trading{% endblock %}</title>
+    <style>
+        /* Fallback font family in case Google Fonts timeout */
+        body, html, * {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Font Awesome v6.5.1 - Primary CDN (Cloudflare - Most Reliable) -->
+    <link id="fontawesome-primary" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- FIX: Font Awesome CDN CSS missing font-family property, manually add it -->
+    <style>
+        /* Apply Font Awesome font-family to all icon variants */
+        .fa:before,
+        .fa::before,
+        .fab:before,
+        .fab::before,
+        .fal:before,
+        .fal::before,
+        .far:before,
+        .far::before,
+        .fas:before,
+        .fas::before,
+        .fat:before,
+        .fat::before,
+        .fad:before,
+        .fad::before,
+        .fa-solid:before,
+        .fa-solid::before,
+        .fa-regular:before,
+        .fa-regular::before,
+        .fa-light:before,
+        .fa-light::before,
+        .fa-thin:before,
+        .fa-thin::before,
+        .fa-duotone:before,
+        .fa-duotone::before,
+        .fa-brands:before,
+        .fa-brands::before,
+        [class^="fa-"]:before,
+        [class*=" fa-"]:before,
+        [class^="fa-"]::before,
+        [class*=" fa-"]::before {
+            font-family: 'Font Awesome 6 Free' !important;
+        }
+        
+        .fa-solid::before,
+        .fas::before,
+        .fa-solid:before,
+        .fas:before {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 900 !important;
+        }
+        
+        .fa-regular::before,
+        .far::before,
+        .fa-regular:before,
+        .far:before {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 400 !important;
+        }
+        
+        .fa-light::before,
+        .fal::before,
+        .fa-light:before,
+        .fal:before {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 300 !important;
+        }
+        
+        .fa-thin::before,
+        .fat::before,
+        .fa-thin:before,
+        .fat:before {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 100 !important;
+        }
+        
+        .fa-brands::before,
+        .fab::before,
+        .fa-brands:before,
+        .fab:before {
+            font-family: 'Font Awesome 6 Brands' !important;
+            font-weight: 400 !important;
+        }
+        
+        .fa-duotone::before,
+        .fad::before,
+        .fa-duotone:before,
+        .fad:before {
+            font-family: 'Font Awesome 6 Duotone' !important;
+            font-weight: 900 !important;
+        }
+        
+        /* Ensure icons are visible */
+        i[class*="fa-"], 
+        .fa, 
+        .fa-solid, 
+        .fa-regular, 
+        .fa-light, 
+        .fa-thin, 
+        .fa-duotone,
+        .fa-brands {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+    </style>
+    <script>
+        console.log('=== Font Awesome Loading Debug Started ===');
+        
+        // Font Awesome CDN Fallback System - Multiple CDN Options
+        (function() {
+            const cdnOptions = [
+                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', // Primary
+                'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css', // Secondary
+                'https://use.fontawesome.com/releases/v6.5.1/css/all.css' // Tertiary
+            ];
+            
+            let cdnIndex = 0;
+            let cdnTested = false;
+            
+            function inspectCSSRules() {
+                console.log('🔍 Inspecting CSS rules that apply to .fa-solid::before');
+                for (let i = 0; i < document.styleSheets.length; i++) {
+                    try {
+                        const sheet = document.styleSheets[i];
+                        if (!sheet.href || (!sheet.href.includes('font-awesome') && !sheet.href.includes('fontawesome'))) {
+                            continue;
+                        }
+                        
+                        console.log('📋 Stylesheet:', sheet.href);
+                        
+                        for (let j = 0; j < sheet.cssRules.length; j++) {
+                            const rule = sheet.cssRules[j];
+                            
+                            // Look for rules that match .fa-solid or .fa or similar
+                            if (rule.selectorText && (
+                                rule.selectorText.includes('.fa-solid') || 
+                                rule.selectorText.includes('::before') ||
+                                rule.selectorText === '.fa' ||
+                                rule.selectorText === '[class*="fa-"]'
+                            )) {
+                                console.log('  Selector:', rule.selectorText);
+                                console.log('    Font-family:', rule.style.fontFamily || 'NOT SET');
+                                console.log('    Content:', rule.style.content || 'NOT SET');
+                                console.log('    Display:', rule.style.display || 'NOT SET');
+                                
+                                // Show all properties
+                                if (rule.style.length > 0) {
+                                    for (let k = 0; k < Math.min(10, rule.style.length); k++) {
+                                        const prop = rule.style[k];
+                                        console.log(`      ${prop}: ${rule.style.getPropertyValue(prop)}`);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        // Skip cross-origin stylesheets
+                    }
+                }
+            }
+            
+            function checkStyleSheet() {
+                console.log('🔍 Checking loaded stylesheets...');
+                for (let i = 0; i < document.styleSheets.length; i++) {
+                    try {
+                        const sheet = document.styleSheets[i];
+                        if (sheet.href && (sheet.href.includes('font-awesome') || sheet.href.includes('fontawesome'))) {
+                            console.log('✓ Found Font Awesome stylesheet:', sheet.href);
+                            console.log('  Total rules:', sheet.cssRules.length);
+                        }
+                    } catch (e) {
+                        if (document.styleSheets[i].href) {
+                            console.log('⚠️  Can\'t access rules from:', document.styleSheets[i].href, '(CORS restricted)');
+                        }
+                    }
+                }
+            }
+            
+            function logIcons() {
+                const icons = document.querySelectorAll('[class*="fa-"]');
+                console.log('📍 Total icon elements found:', icons.length);
+                if (icons.length > 0) {
+                    console.log('📍 First 3 icons with full style inspection:');
+                    Array.from(icons).slice(0, 3).forEach((icon, i) => {
+                        const computed = window.getComputedStyle(icon, ':before');
+                        console.log(`\n  [${i}] Element:`, icon.outerHTML.substring(0, 100));
+                        console.log(`      Class: ${icon.className}`);
+                        console.log(`      Computed ::before styles:`);
+                        console.log(`        - content: ${computed.content}`);
+                        console.log(`        - font-family: ${computed.fontFamily}`);
+                        console.log(`        - font-weight: ${computed.fontWeight}`);
+                        console.log(`        - font-size: ${computed.fontSize}`);
+                        console.log(`        - display: ${computed.display}`);
+                        
+                        // Try to detect the actual computed font
+                        const fontFamily = computed.fontFamily;
+                        const hasAwesome = fontFamily.toLowerCase().includes('awesome');
+                        console.log(`        - ✓ Has Font Awesome font? ${hasAwesome}`);
+                    });
+                }
+            }
+            
+            function testFontAwesome() {
+                console.log('🔍 Testing Font Awesome (attempt ' + (cdnIndex + 1) + ')...');
+                if (cdnTested) {
+                    console.log('⚠️  Already tested, skipping');
+                    return;
+                }
+                cdnTested = true;
+                
+                try {
+                    // Check stylesheets first
+                    checkStyleSheet();
+                    
+                    // Inspect CSS rules
+                    inspectCSSRules();
+                    
+                    // Test with fa-solid format (what you're actually using)
+                    const testDiv = document.createElement('div');
+                    testDiv.className = 'fa-solid fa-check';
+                    testDiv.style.display = 'inline-block';
+                    testDiv.style.visibility = 'visible';
+                    testDiv.id = 'fa-test-element';
+                    document.body.appendChild(testDiv);
+                    
+                    console.log('\n📝 Test element created with class: fa-solid fa-check');
+                    console.log('   HTML:', testDiv.outerHTML);
+                    
+                    const computed = window.getComputedStyle(testDiv, ':before');
+                    const content = computed.content || computed.getPropertyValue('content');
+                    const fontFamily = computed.fontFamily || computed.getPropertyValue('font-family');
+                    const fontSize = computed.fontSize;
+                    const display = computed.display;
+                    const fontWeight = computed.fontWeight;
+                    
+                    console.log('\n🔎 Test element pseudo-element (::before) computed styles:');
+                    console.log('   - Content:', JSON.stringify(content));
+                    console.log('   - Font-family:', fontFamily);
+                    console.log('   - Font-weight:', fontWeight);
+                    console.log('   - Font-size:', fontSize);
+                    console.log('   - Display:', display);
+                    
+                    // Check if Font Awesome is applied
+                    const isFontAwesome = fontFamily.toLowerCase().includes('awesome') || 
+                                         fontFamily.toLowerCase().includes('fontawesome');
+                    
+                    console.log('\n💡 Analysis:');
+                    console.log('   - Font Awesome font applied?', isFontAwesome ? '✅ YES' : '❌ NO');
+                    console.log('   - Content has glyph?', (content && content !== '""' && content !== 'none') ? '✅ YES' : '❌ NO');
+                    
+                    if (!isFontAwesome) {
+                        console.log('\n🚨 PROBLEM: CSS selectors for .fa-solid::before are NOT applying font-family!');
+                        console.log('   This means the Font Awesome CSS rules are not matching the selectors.');
+                    }
+                    
+                    document.body.removeChild(testDiv);
+                    
+                    // Log actual icons on page
+                    setTimeout(() => {
+                        logIcons();
+                    }, 100);
+                    
+                    return isFontAwesome;
+                } catch(e) {
+                    console.error('💥 Font Awesome detection error:', e);
+                    console.error('Stack:', e.stack);
+                    return false;
+                }
+            }
+            
+            function loadFallback() {
+                cdnIndex++;
+                if (cdnIndex >= cdnOptions.length) {
+                    console.error('\n❌ All Font Awesome CDN options failed!');
+                    console.error('🔴 Probable cause: CSS selectors in Font Awesome CSS do not match .fa-solid format');
+                    console.error('   Font files are loading but ::before pseudo-element styles not applied');
+                    return;
+                }
+                
+                console.log('\n🔗 Loading Font Awesome CDN #' + (cdnIndex + 1) + ':', cdnOptions[cdnIndex]);
+                const fallbackLink = document.createElement('link');
+                fallbackLink.rel = 'stylesheet';
+                fallbackLink.href = cdnOptions[cdnIndex];
+                fallbackLink.crossOrigin = 'anonymous';
+                fallbackLink.referrerPolicy = 'no-referrer';
+                fallbackLink.onload = function() {
+                    console.log('✨ Fallback CDN #' + (cdnIndex + 1) + ' loaded! Testing...');
+                    cdnTested = false;
+                    setTimeout(() => testFontAwesome(), 500);
+                };
+                fallbackLink.onerror = function() {
+                    console.error('❌ Failed to load fallback CDN #' + (cdnIndex + 1));
+                    loadFallback();
+                };
+                document.head.appendChild(fallbackLink);
+            }
+            
+            // Initial log
+            console.log('📦 Available CDN options:');
+            cdnOptions.forEach((url, i) => console.log(`  [${i + 1}] ${url}`));
+            
+            // Test after 1 second
+            setTimeout(() => {
+                console.log('\n⏱️  1 second timeout - Testing Font Awesome...\n');
+                if (!testFontAwesome()) {
+                    console.log('\n📍 Primary CDN failed, trying fallbacks...');
+                    loadFallback();
+                }
+            }, 1000);
+            
+            console.log('=== Font Awesome Debug Script Initialized ===');
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400..700;1,400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <script src="{% static 'js/base.js' %}?v=2.9"></script>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <!-- Three.js Libraries - Load from local static files (proven to work) -->
+    <script>
+        // Load THREE.js libraries sequentially from local static files
+        // This ensures they load in correct order and are always available
+        
+        console.log('Starting THREE.js library loading...');
+        
+        function loadThreeLibraries() {
+            // Load THREE.js first
+            const threeScript = document.createElement('script');
+            threeScript.src = '{% static "libs/three/three.min.js" %}';
+            threeScript.onload = function() {
+                console.log('✓ THREE.js loaded');
+                loadGLTFLoader();
+            };
+            threeScript.onerror = function() {
+                console.error('✗ Failed to load THREE.js from local static');
+                // Fallback to CDN
+                loadFromCDN();
+            };
+            document.head.appendChild(threeScript);
+        }
+        
+        function loadGLTFLoader() {
+            const gltfScript = document.createElement('script');
+            gltfScript.src = '{% static "libs/three/GLTFLoader.js" %}';
+            gltfScript.onload = function() {
+                console.log('✓ GLTFLoader loaded');
+                loadGLTFWrapper();
+            };
+            gltfScript.onerror = function() {
+                console.error('✗ Failed to load GLTFLoader');
+                loadOrbitControls();
+            };
+            document.head.appendChild(gltfScript);
+        }
+        
+        function loadGLTFWrapper() {
+            const wrapperScript = document.createElement('script');
+            wrapperScript.src = '{% static "libs/three/GLTFLoader-wrapper.js" %}';
+            wrapperScript.onload = function() {
+                console.log('✓ GLTFLoader wrapper loaded');
+                loadOrbitControls();
+            };
+            wrapperScript.onerror = function() {
+                console.error('✗ Failed to load GLTFLoader wrapper');
+                loadOrbitControls();
+            };
+            document.head.appendChild(wrapperScript);
+        }
+        
+        function loadOrbitControls() {
+            const orbitScript = document.createElement('script');
+            orbitScript.src = '{% static "libs/three/OrbitControls.js" %}';
+            orbitScript.onload = function() {
+                console.log('✓ OrbitControls loaded');
+                loadOrbitWrapper();
+            };
+            orbitScript.onerror = function() {
+                console.error('✗ Failed to load OrbitControls');
+                markThreeReady();
+            };
+            document.head.appendChild(orbitScript);
+        }
+        
+        function loadOrbitWrapper() {
+            const wrapperScript = document.createElement('script');
+            wrapperScript.src = '{% static "libs/three/OrbitControls-wrapper.js" %}';
+            wrapperScript.onload = function() {
+                console.log('✓ OrbitControls wrapper loaded');
+                markThreeReady();
+            };
+            wrapperScript.onerror = function() {
+                console.error('✗ Failed to load OrbitControls wrapper');
+                markThreeReady();
+            };
+            document.head.appendChild(wrapperScript);
+        }
+        
+        function markThreeReady() {
+            // Set global flags
+            window.THREE_READY = true;
+            console.log('✓ THREE.js ready');
+            
+            // Attach to THREE namespace if not already done
+            if (typeof THREE !== 'undefined') {
+                if (typeof GLTFLoader !== 'undefined' && !THREE.GLTFLoader) {
+                    THREE.GLTFLoader = GLTFLoader;
+                }
+                if (typeof OrbitControls !== 'undefined' && !THREE.OrbitControls) {
+                    THREE.OrbitControls = OrbitControls;
+                }
+            }
+        }
+        
+        function loadFromCDN() {
+            console.log('Loading THREE.js from CDN...');
+            // Fallback to unpkg CDN
+            const scripts = [
+                { src: 'https://unpkg.com/three@r128/build/three.min.js', name: 'THREE.js' },
+                { src: 'https://unpkg.com/three@r128/examples/js/loaders/GLTFLoader.js', name: 'GLTFLoader' },
+                { src: 'https://unpkg.com/three@r128/examples/js/controls/OrbitControls.js', name: 'OrbitControls' }
+            ];
+            
+            let loaded = 0;
+            scripts.forEach((item) => {
+                const script = document.createElement('script');
+                script.src = item.src;
+                script.async = true;
+                script.onload = function() {
+                    console.log('✓ CDN loaded:', item.name);
+                    loaded++;
+                    if (loaded === scripts.length) {
+                        markThreeReady();
+                    }
+                };
+                script.onerror = function() {
+                    console.error('✗ CDN failed:', item.name);
+                    loaded++;
+                    if (loaded === scripts.length) {
+                        markThreeReady();
+                    }
+                };
+                document.head.appendChild(script);
+            });
+        }
+        
+        // Start loading when document is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadThreeLibraries);
+        } else {
+            loadThreeLibraries();
+        }
+    </script>
+    <!-- Font Awesome Fallback Check -->
+    <script>
+        // Check if Font Awesome loaded, if not try to load from alternate CDN
+        window.addEventListener('load', function() {
+            // Check if Font Awesome is loaded by looking for a Font Awesome element
+            setTimeout(function() {
+                // Try to detect if font-awesome is loaded
+                const testElement = document.createElement('i');
+                testElement.className = 'fas fa-check';
+                testElement.style.visibility = 'hidden';
+                document.body.appendChild(testElement);
+                
+                const beforeContent = window.getComputedStyle(testElement, ':before').content;
+                document.body.removeChild(testElement);
+                
+                // If Font Awesome didn't load, add alternate CDN link
+                if (!beforeContent || beforeContent === 'none' || beforeContent === '') {
+                    console.warn('Font Awesome not detected, loading fallback...');
+                    
+                    // Create link for fallback Font Awesome from jsDelivr
+                    const fallbackLink = document.createElement('link');
+                    fallbackLink.rel = 'stylesheet';
+                    fallbackLink.href = 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css';
+                    fallbackLink.crossOrigin = 'anonymous';
+                    fallbackLink.referrerPolicy = 'no-referrer';
+                    document.head.appendChild(fallbackLink);
+                    
+                    console.log('Loaded Font Awesome fallback from jsDelivr');
+                }
+            }, 500);
+        });
+    </script>
+</head>
+<body data-cart-count="{{ cart_count }}">
+
+    <header class="site-header">
+        <div class="header-inner container">
+            <a class="brand-link" href="{% url 'home' %}">
+                <img src="{% static 'images/LOGO.png' %}" alt="Koya Nardz" class="brand-logo">
+                <div class="brand-text">
+                    <span class="brand-title">Koya Nardz</span>
+                    <small class="brand-sub">Computer Trading</small>
+                </div>
+            </a>
+
+            <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                <span class="hamburger"></span>
+            </button>
+
+            <nav class="main-nav" aria-label="Primary navigation" style="text-transform: uppercase;">
+                <ul class="nav-list" style="text-transform: uppercase;">
+                    <li><a href="{% url 'product' %}"><span>Products</span></a></li>
+                    <li class="has-sub">
+                        <a href="{% url 'selling_information' %}"><span>Trade</span></a>
+                    </li>
+                    <li><a href="{% url 'my_appointment' %}"><span>Appointment</span></a></li>
+                    <li class="nav-actions-mobile"><a href="{% url 'cart' %}"><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i><span>Cart</span></a></li>
+                    <li class="nav-actions-mobile">{% if user.is_authenticated %}<a href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>Logout</span></a>{% else %}<a href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i><span>Sign in</span></a>{% endif %}</li>
+                    <li class="nav-actions-mobile">
+                        <button id="favToggleMobile" class="action-btn-mobile"><i class="fa-regular fa-heart" aria-hidden="true"></i><span>Favorites</span></button>
+                        <div id="favoriteMobileDropdown" class="dropdown-panel">
+                            {% if products_favorite %}
+                                {% for produkto in products_favorite %}
+                                <div class="fav-item" data-product-id="{{ produkto.id }}">
+                                    <div class="fav-left">
+                                        <a href="{% url 'product_item' produkto.id %}"><img src="{{ produkto.image.url }}" alt="{{ produkto.product_name }}"></a>
+                                    </div>
+                                    <div class="fav-meta">{{ produkto.product_name }}</div>
+                                    <div class="fav-actions">
+                                        <button type="button" class="fav-remove-btn" data-product-id="{{ produkto.id }}" aria-label="Remove from favorites"><i class="fa-solid fa-trash-alt" aria-hidden="true"></i></button>
+                                        <form action="{% url 'add_to_cart' produkto.id %}" method="POST">{% csrf_token %}<button type="submit" aria-label="Add to cart"><i class="fa-solid fa-shopping-cart" aria-hidden="true"></i></button></form>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="no-fav">No favorites yet</p>
+                            {% endif %}
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <a class="action-btn cart-btn" href="{% url 'cart' %}" title="Cart">
+                    <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+                    <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+                </a>
+
+                <div class="dropdown favorite-dropdown">
+                    <button id="favToggle" class="action-btn" aria-haspopup="true" aria-expanded="false"><i class="fa-regular fa-heart" aria-hidden="true"></i></button>
+                    <div id="favoriteDropdown" class="dropdown-panel">
+                        {% if products_favorite %}
+                            {% for produkto in products_favorite %}
+                            <div class="fav-item" data-product-id="{{ produkto.id }}">
+                                <div class="fav-left">
+                                    <a href="{% url 'product_item' produkto.id %}"><img src="{{ produkto.image.url }}" alt="{{ produkto.product_name }}"></a>
+                                    <div class="fav-meta">{{ produkto.product_name }}</div>
+                                </div>
+                                <div class="fav-actions">
+                                    <button type="button" class="fav-remove-btn" data-product-id="{{ produkto.id }}" aria-label="Remove from favorites"><i class="fa-solid fa-trash-alt" aria-hidden="true"></i></button>
+                                    <form action="{% url 'add_to_cart' produkto.id %}" method="POST">{% csrf_token %}<button type="submit" aria-label="Add to cart"><i class="fa-solid fa-shopping-cart" aria-hidden="true"></i></button></form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="no-fav">No favorites yet</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="dropdown user-dropdown">
+                    {% if user.is_authenticated %}
+                        <button id="userToggle" class="action-btn user-btn">
+                            <i class="fa-solid fa-user" aria-hidden="true"></i>
+                        </button>
+                        <div id="userDropdown" class="dropdown-panel user-dropdown-panel">
+                            <div class="user-card">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="avatar-img-large">
+                                {% else %}
+                                    <i class="fa-solid fa-user-circle" aria-hidden="true" style="font-size: 2rem; color: #0b84c6;"></i>
+                                {% endif %}
+                                <div class="user-info" style="text-transform: capitalize;">{{ user.username }}</div>
+                            </div>
+                            <a href="{% url 'profile' %}"><i class="fa-solid fa-user-gear" aria-hidden="true"></i>Profile</a>
+                            <a href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>Logout</a>
+                        </div>
+                    {% else %}
+                        <a class="action-btn" href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-wrapper" style="background-color: whitesmoke;">{% block content %}{% endblock %}</main>
+
+    <footer class="site-footer">
+        <div class="footer-inner container">
+            <div class="footer-col footer-about">
+                <h4>About</h4>
+                <p>Koya Nardz Computer Trading — trusted tech shop since 2016. New and secondhand laptops, desktops, and PC parts.</p>
+                <div class="socials">
+                    <a href="https://www.facebook.com/KOYANARDZGAMIN?log_join_id=94609efe-f6a2-435e-bff9-cbee4b2df289" class="social" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                    <a href="instagram://user/?username=knctrading&igsh=MTBnZ2Z2eTdyemxzbw%3D%3D" class="social" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                    <a href="#" class="social" aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                </div>
+            </div>
+            <div class="footer-col footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="{% url 'product' %}">Products</a></li>
+                    <li><a href="{% url 'selling' %}">Sell</a></li>
+                    <li><a href="{% url 'my_appointment' %}">Appointment</a></li>
+                </ul>
+            </div>
+            <div class="footer-col footer-contact">
+                <h4>Contact</h4>
+                <p>Address: 342 Molino Rd. Bacoor, Cavite</p>
+                <p>Email: koyanardzshop@gmail.com</p>
+                <p>Contact: +63 916 541 1490 / +63 929 501 7109</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">© {% now "Y" %} Koya Nardz — All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile nav toggle
+        (function(){
+            const toggle = document.querySelector('.nav-toggle');
+            const nav = document.querySelector('.main-nav');
+            toggle && toggle.addEventListener('click', function(){
+                const expanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', String(!expanded));
+                nav.classList.toggle('open');
+            });
+
+            // Favorite dropdown / mobile redirect
+            const favBtn = document.getElementById('favToggle');
+            const favPanel = document.getElementById('favoriteDropdown');
+            favBtn && favBtn.addEventListener('click', function(e){
+                const isMobile = window.matchMedia('(max-width: 768px)').matches;
+                if (isMobile) {
+                    // On mobile, go to the favorites page instead of showing dropdown
+                    window.location.href = "{% url 'favorite' %}";
+                    return;
+                }
+                e.stopPropagation();
+                const open = favPanel.style.display === 'block';
+                favPanel.style.display = open ? 'none' : 'block';
+            });
+
+            // User dropdown toggle
+            const userBtn = document.getElementById('userToggle');
+            const userPanel = document.getElementById('userDropdown');
+            userBtn && userBtn.addEventListener('click', function(e){
+                e.stopPropagation();
+                userPanel.style.display = userPanel.style.display === 'block' ? 'none' : 'block';
+            });
+
+            // Close dropdowns on outside click
+            document.addEventListener('click', function(e){
+                if(favPanel && !favPanel.contains(e.target) && e.target.id !== 'favToggle') favPanel.style.display = 'none';
+                if(userPanel && !userPanel.contains(e.target) && e.target.id !== 'userToggle') userPanel.style.display = 'none';
+            });
+
+            // Mobile buttons that live inside the nav overlay
+            const favBtnMobile = document.getElementById('favToggleMobile');
+            const favMobilePanel = document.getElementById('favoriteMobileDropdown');
+            const userBtnMobile = document.getElementById('userToggleMobile');
+            
+            favBtnMobile && favBtnMobile.addEventListener('click', function(e){
+                e.stopPropagation();
+                // On mobile, show/hide the favorites dropdown
+                if (favMobilePanel) {
+                    favMobilePanel.classList.toggle('show');
+                }
+            });
+            
+            userBtnMobile && userBtnMobile.addEventListener('click', function(e){
+                e.stopPropagation();
+                nav.classList.add('open');
+                userPanel && (userPanel.style.display = userPanel.style.display === 'block' ? 'none' : 'block');
+            });
+
+            // Cart badge count
+            function updateCartBadge() {
+                const badge = document.getElementById('cartBadge');
+                const cartCount = document.body.getAttribute('data-cart-count') || '0';
+                const count = parseInt(cartCount);
+                
+                if (count > 0) {
+                    badge.textContent = count > 99 ? '99+' : count;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            // Initialize cart badge on page load
+            updateCartBadge();
+
+            // Listen for cart updates (custom event)
+            document.addEventListener('cartUpdated', updateCartBadge);
+        })();
+    </script>
+</body>
+</html>
+            

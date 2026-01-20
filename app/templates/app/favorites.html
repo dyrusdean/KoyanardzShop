@@ -1,0 +1,53 @@
+
+{% extends 'app/navigation.html' %}
+{% load static %}
+{% load humanize %}
+
+
+{% block content %}
+<div class="favoritespage">
+    <div class="favorite_body">
+        <div class="favorite_bodybody">
+            <h3>My Wishlist</h3>
+            {% if products %}
+                {% for produkto in products %}
+                <div class="favorites">
+                    <div class="favoritesbody">
+                        <div class="favorites_upper">
+                            <button type="button" class="favorite_btn {% if produkto.id|stringformat:'s' in favorites %}favorited{% endif %}" data-product-id="{{ produkto.id }}" aria-label="Remove from favorites">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="favorites_image">
+                            {% if produkto.image %}
+                                <img src="{{ produkto.image.url }}" alt="Product">
+                            {% endif %}
+                            <div class="favorites_text">
+                                <a href="{% url 'product_item' produkto.id %}"><p>{{ produkto.product_name }}</p></a>
+                                <div class="favorites_price">
+                                    <p>Price: ₱{{ produkto.price|floatformat:2|intcomma }}</p>
+                                </div>
+                                <div class="favorites_actions">
+                                    <form action="{% url 'add_to_cart' produkto.id %}" method="POST" class="add-to-cart-form">
+                                        {% csrf_token %}
+                                        <button class="add-to-cart-text">Add to Cart</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="favoritespage_empty">
+                    <div class="favoritespage_emptybody" style="text-align: center;">
+                        <p>No favorite products yet</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Favorite button handlers are managed globally by base.js -->
+{% endblock content %}

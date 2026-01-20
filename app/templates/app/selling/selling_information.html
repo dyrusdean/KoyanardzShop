@@ -1,0 +1,212 @@
+{% extends 'app/navigation.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="sellinginformationpage">
+        <!-- Hero Section -->
+        <section class="selling-hero">
+            <div class="hero-content">
+                <div class="hero-left">
+                    <h1>Turn Your Old Devices Into Cash</h1>
+                    <p class="hero-subtitle">Get instant quotes for your laptops, desktops, and computer parts</p>
+                    <div class="hero-features">
+                        <div class="feature-item">
+                            <span class="feature-icon">⚡</span>
+                            <div>
+                                <h4>Quick Evaluation</h4>
+                                <p>Fair market-based pricing</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">💰</span>
+                            <div>
+                                <h4>Multiple Options</h4>
+                                <p>Cash or store credit</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🚀</span>
+                            <div>
+                                <h4>Simple Process</h4>
+                                <p>Book & sell in minutes</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="selling-cta-primary">
+                        <a href="{% url 'selling' %}" class="btn-primary">Get Started</a>
+                        <a href="#how-it-works" class="btn-secondary">Learn More</a>
+                    </div>
+                </div>
+                <div class="hero-right">
+                    <div class="hero-image">
+                        <img src="{% static 'images/selling1-backgrounds.png' %}" alt="Sell or trade background" class="bg">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="selling-process" id="how-it-works">
+            <div class="process-container">
+                <h2>How It Works</h2>
+                <div class="process-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-icon">📝</div>
+                        <h3>Book Appointment</h3>
+                        <p>Schedule a convenient time to bring your device</p>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-icon">🔍</div>
+                        <h3>Device Assessment</h3>
+                        <p>Our experts inspect condition & functionality</p>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-icon">💵</div>
+                        <h3>Get Quoted</h3>
+                        <p>Receive instant fair market valuation</p>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-icon">✅</div>
+                        <h3>Get Paid</h3>
+                        <p>Cash or store credit - your choice</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- We Accept Section -->
+        <section class="selling-accepts">
+            <div class="accepts-container">
+                <h2>What We Accept</h2>
+                <div class="accept-items">
+                    <div class="accept-card">
+                        <div class="accept-icon">💻</div>
+                        <h3>Laptops</h3>
+                        <p>All brands & conditions</p>
+                        <ul>
+                            <li>Gaming Laptops</li>
+                            <li>Ultrabooks</li>
+                            <li>Budget Laptops</li>
+                            <li>MacBooks</li>
+                        </ul>
+                    </div>
+                    <div class="accept-card">
+                        <div class="accept-icon">🖥️</div>
+                        <h3>Desktops</h3>
+                        <p>Complete or partial units</p>
+                        <ul>
+                            <li>Gaming PCs</li>
+                            <li>Workstations</li>
+                            <li>iMacs</li>
+                            <li>Office Setups</li>
+                        </ul>
+                    </div>
+                    <div class="accept-card">
+                        <div class="accept-icon">⚙️</div>
+                        <h3>Components</h3>
+                        <p>Individual parts & upgrades</p>
+                        <ul>
+                            <li>GPUs & CPUs</li>
+                            <li>RAM & SSDs</li>
+                            <li>Motherboards</li>
+                            <li>Power Supplies</li>
+                        </ul>
+                    </div>
+                    <div class="accept-card">
+                        <div class="accept-icon">📱</div>
+                        <h3>Accessories</h3>
+                        <p>Monitors, keyboards & more</p>
+                        <ul>
+                            <li>Monitors</li>
+                            <li>Keyboards & Mouse</li>
+                            <li>Cables & Adapters</li>
+                            <li>Peripherals</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What We Need Section -->
+        <section class="selling-requirements">
+            <div class="requirements-container">
+                <h2>What We Need From You</h2>
+                <div class="requirements-grid">
+                    <div class="requirement-item">
+                        <div class="requirement-header">
+                            <span class="requirement-icon">📸</span>
+                            <h3>Clear Photos</h3>
+                        </div>
+                        <p>High-quality images of your device from multiple angles, including any damage or wear</p>
+                    </div>
+                    <div class="requirement-item">
+                        <div class="requirement-header">
+                            <span class="requirement-icon">📋</span>
+                            <h3>Device Details</h3>
+                        </div>
+                        <p>Brand, model, processor, RAM, storage, and any relevant specifications</p>
+                    </div>
+                    <div class="requirement-item">
+                        <div class="requirement-header">
+                            <span class="requirement-icon">🔧</span>
+                            <h3>Condition Report</h3>
+                        </div>
+                        <p>Whether it's working perfectly, has minor issues, or needs repair</p>
+                    </div>
+                    <div class="requirement-item">
+                        <div class="requirement-header">
+                            <span class="requirement-icon">🎁</span>
+                            <h3>Accessories</h3>
+                        </div>
+                        <p>Include original charger, cables, and boxes if available for better value</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Device Condition Section -->
+        <section class="selling-conditions">
+            <div class="conditions-container">
+                <h2>Device Condition Categories</h2>
+                <div class="conditions-flex">
+                    <div class="condition-card excellent">
+                        <h4>⭐ Excellent</h4>
+                        <p>Like new, minimal scratches, full functionality</p>
+                        <div class="price-range">Highest Value</div>
+                    </div>
+                    <div class="condition-card good">
+                        <h4>✨ Good</h4>
+                        <p>Normal wear, fully functional, minor cosmetic damage</p>
+                        <div class="price-range">High Value</div>
+                    </div>
+                    <div class="condition-card fair">
+                        <h4>👍 Fair</h4>
+                        <p>Visible wear, functional with minor issues</p>
+                        <div class="price-range">Fair Value</div>
+                    </div>
+                    <div class="condition-card needs-repair">
+                        <h4>🔧 Needs Repair</h4>
+                        <p>Not working or major issues, parts value</p>
+                        <div class="price-range">Parts Value</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="selling-final-cta">
+            <div class="cta-box">
+                <h2>Ready to Sell?</h2>
+                <p>Book your appointment now and get a quote on the spot</p>
+                <a href="{% url 'selling' %}" class="btn-primary-large">Schedule Appointment</a>
+            </div>
+        </section>
+    </div>
+{% endblock content %}

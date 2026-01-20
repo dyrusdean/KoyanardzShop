@@ -1,0 +1,42 @@
+{% extends 'app/navigation.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="completepage">
+    <div class="uppercomplete">
+        <ul>
+            <li>Cart</li>
+            <p>></p>
+            <li>Appointment</li>
+            <p>></p>
+            <li>Checkout</li>
+            <p>></p>
+            <li>Complete</li>
+        </ul>
+    </div>
+    <div class="complete_body">
+        <div class="completebody_textbody">
+            <div class="completebody_image">
+                <img src="{% static 'images/notification.png' %}" alt="">
+            </div>
+            <div class="completebody_text">
+                <h3>Thank you!</h3>
+                <div class="completebody_bodytext">
+                    <p>Your appointment request for product has been received.</p>
+                    <p>Reference Number: <span>{{ reference_number }}</span></p>
+                    <p>A confirmation email has been sent to your registered email address.</p>
+                    <p>Please note: Your appointment is subject to approval. You will receive another notification once it has been confirmed.</br>
+                        We appreciate your interest and will get back to you shortly.
+                    </p>
+                </div>
+                <div class="complete_button">
+                    <a href="{% url 'my_appointment' %}">Check your Appointment</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

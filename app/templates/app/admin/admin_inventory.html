@@ -1,0 +1,97 @@
+{% extends 'app/admin/admin_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="admin_productpage">
+    <div class="product-header">
+        <h2>Inventory Management</h2>
+    </div>
+    
+    <div class="upperproduct">
+        <div class="product-filters">
+            <form action="" method="GET" class="filter-form">
+                <div class="filter-group">
+                    <select name="category" class="filter-select">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:"s" %}selected{% endif %}>{{ category.category_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="filter-btn">Filter</button>
+            </form>
+        </div>
+        
+        <div class="product-search">
+            <form action="" method="GET" class="search-form">
+                <input type="text" name="search" placeholder="Search products..." value="{{ search_query }}" class="search-input">
+                {% if category_filter and category_filter != '' %}<input type="hidden" name="category" value="{{ category_filter }}">{% endif %}
+                <button type="submit" class="search-btn">🔍</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Inventory Table -->
+    <div class="products-table-container">
+        <div class="table-wrapper">
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Stock</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if products %}
+                        {% for produkto in products %}
+                        <tr>
+                            <td data-label="ID">{{ produkto.id }}</td>
+                            <td data-label="Product Name" class="product-name">{{ produkto.product_name }}</td>
+                            <td data-label="Category">{{ produkto.category_name.category_name }}</td>
+                            <td data-label="Stock" class="stock-column">
+                                <span class="stock-badge {% if produkto.stock > 20 %}stock-high{% elif produkto.stock > 5 %}stock-medium{% else %}stock-low{% endif %}">
+                                    {{ produkto.stock }}
+                                </span>
+                            </td>
+                            <td data-label="Price" class="price-column">₱{{ produkto.price|intcomma }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="5" class="no-data">No products found</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="bottominventory">
+        <div class="left_inventory">
+            <p class="product-count">Total Products: <strong>{{ products.count }}</strong></p>
+        </div>
+        <div class="right_inventory">
+            <a href="javascript:void(0);" id="download-pdf">
+                <button class="pdf-btn">📥 Download PDF</button>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.20/jspdf.plugin.autotable.min.js"></script>
+<script>
+    document.getElementById('download-pdf').addEventListener('click', function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const table = document.querySelector('.products-table');
+        doc.autoTable({ html: table });
+        doc.save('inventory-list.pdf');
+    });
+</script>
+{% endblock content %}

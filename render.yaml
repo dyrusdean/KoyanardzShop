@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: BuynSell
+    runtime: python
+    runtimeVersion: 3.13.4
+    rootDir: ./
+    buildCommand: git lfs install && git lfs pull && pip install -r requirements.txt && python manage.py collectstatic --noinput
+    # Run migrations as a post-deploy step so failures are visible in deploy logs
+    postdeploy:
+      - python manage.py migrate --noinput
+      - python manage.py collectstatic --noinput
+    # Start only the application process here. Migrations run in postdeploy.
+    # Using sync workers with lower worker count to reduce memory footprint
+    # Sync workers are more suitable for Django on resource-constrained servers
+    startCommand: gunicorn BuynSell.wsgi:application --bind 0.0.0.0:10000 --workers 1 --worker-class sync --worker-connections 5 --max-requests 1000 --timeout 30
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.4
+      - key: DJANGO_SETTINGS_MODULE
+        value: BuynSell.settings
+      - key: PORT
+        value: 10000

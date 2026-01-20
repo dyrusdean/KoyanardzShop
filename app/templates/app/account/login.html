@@ -1,0 +1,399 @@
+{% extends 'app/navigation.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        background: #f5f7fa !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    /* Hide global header/navigation and footer for the login page */
+    header, nav, .navbar, .site-header, .topbar, .main-nav, .navigation, .header, .site-navigation,
+    footer, .site-footer, .page-footer, .footer, .footer-wrapper, .bottom-footer { display: none !important; }
+    
+    /* Home button */
+    .login-home-btn {
+        position: fixed;
+        left: 24px;
+        top: 24px;
+        z-index: 1200;
+        background: #fff;
+        color: #222;
+        padding: 10px 16px;
+        border-radius: 8px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    
+    .login-home-btn:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+    }
+    
+    .loginpage {
+        padding-top: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    }
+    
+    .loginpage_body {
+        display: flex;
+        width: 90%;
+        max-width: 1000px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+        overflow: hidden;
+    }
+    
+    .loginpage_left, .loginpage_right {
+        flex: 1;
+        padding: 48px 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .loginpage_leftbody {
+        width: 100%;
+        text-align: center;
+        color: white;
+        padding: 40px 30px;
+    }
+    
+    .loginpage_leftbody h4 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        font-weight: 700;
+        color: white;
+    }
+    
+    .loginleft_bodyp {
+        margin-bottom: 30px;
+    }
+    
+    .loginleft_bodyp p {
+        font-size: 1rem;
+        line-height: 1.6;
+        opacity: 1;
+        color: white;
+    }
+    
+    .loginpage_leftbody a {
+        display: inline-block;
+        padding: 12px 40px;
+        background: #003d99;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .loginpage_leftbody a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 61, 153, 0.3);
+    }
+    
+    /* Right side / form styling */
+    .loginpage_rightbody {
+        width: 100%;
+    }
+    
+    .loginpage_rightbody h2 {
+        font-size: 2rem;
+        margin-bottom: 30px;
+        color: #222;
+        font-weight: 700;
+    }
+    
+    /* Form styling */
+    .loginpage_rightbody form {
+        width: 100%;
+    }
+    
+    .form_field {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .loginpage_rightbody form {
+        width: 100%;
+    }
+    
+    .loginpage_rightbody form input {
+        width: 100% !important;
+        padding: 12px 40px 12px 16px !important;
+        border: 1.5px solid #ddd !important;
+        border-radius: 8px !important;
+        font-size: 0.95rem !important;
+        font-family: inherit !important;
+        transition: all 0.3s ease !important;
+        background: white !important;
+        box-sizing: border-box !important;
+        display: block !important;
+        line-height: 1.4 !important;
+    }
+    
+    .loginpage_rightbody form input:focus {
+        outline: none !important;
+        border-color: #003d99 !important;
+        box-shadow: 0 0 0 3px rgba(0, 61, 153, 0.1) !important;
+    }
+    
+    .loginpage_rightbody form input::placeholder {
+        color: #999 !important;
+    }
+    
+    .form_field i {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        pointer-events: none;
+        font-size: 1.1rem;
+    }
+    
+    .password-wrapper {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .password-wrapper input {
+        width: 100% !important;
+        padding: 12px 40px 12px 16px !important;
+        border: 1.5px solid #ddd !important;
+        border-radius: 8px !important;
+        font-size: 0.95rem !important;
+        font-family: inherit !important;
+        transition: all 0.3s ease !important;
+        background: white !important;
+        box-sizing: border-box !important;
+        display: block !important;
+        line-height: 1.4 !important;
+    }
+    
+    .password-wrapper input:focus {
+        outline: none !important;
+        border-color: #003d99 !important;
+        box-shadow: 0 0 0 3px rgba(0, 61, 153, 0.1) !important;
+    }
+    
+    .toggle-password {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+    
+    .toggle-password:hover {
+        opacity: 1;
+    }
+    
+    .forgot-password-link {
+        display: inline-block;
+        color: #003d99;
+        text-decoration: none;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        transition: color 0.3s;
+    }
+    
+    .forgot-password-link:hover {
+        color: #001a4d;
+        text-decoration: underline;
+    }
+    
+    /* Button styling */
+    button[type="submit"] {
+        width: 100%;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #001a4d 0%, #003d99 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    button[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 61, 153, 0.3);
+    }
+    
+    button[type="submit"]:active {
+        transform: translateY(0);
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .login-home-btn {
+            left: 14px;
+            top: 14px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+        }
+        
+        .loginpage_body {
+            flex-direction: column;
+            width: 95%;
+        }
+        
+        .loginpage_left, .loginpage_right {
+            padding: 36px 24px;
+        }
+        
+        .loginpage_rightbody h2 {
+            font-size: 1.6rem;
+            margin-bottom: 24px;
+        }
+        
+        .loginpage_leftbody h4 {
+            font-size: 1.4rem;
+        }
+        
+        .form_field input, .password-wrapper input {
+            padding: 11px 36px 11px 14px;
+            font-size: 0.9rem;
+        }
+        
+        button[type="submit"] {
+            padding: 11px 20px;
+            font-size: 0.95rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .login-home-btn {
+            left: 10px;
+            top: 10px;
+            padding: 6px 10px;
+            font-size: 0.75rem;
+        }
+        
+        .loginpage_left, .loginpage_right {
+            padding: 24px 16px;
+        }
+        
+        .loginpage_rightbody h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+        }
+        
+        .form_field input, .password-wrapper input {
+            padding: 10px 36px 10px 12px;
+            font-size: 0.85rem;
+        }
+        
+        .form_field {
+            margin-bottom: 16px;
+        }
+        
+        .loginpage_leftbody h4 {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+        }
+        
+        .loginleft_bodyp p {
+            font-size: 0.9rem;
+        }
+        
+        .loginpage_leftbody a {
+            padding: 10px 32px;
+            font-size: 0.85rem;
+        }
+        
+        button[type="submit"] {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<a class="login-home-btn" href="{% url 'product' %}"><i class="fa-solid fa-home"></i> Home</a>
+
+<div class="loginpage">
+    <div class="loginpage_body">
+        <div class="loginpage_left">
+            <div class="loginpage_leftbody">
+                <h4>Hello, Welcome!</h4>
+                <div class="loginleft_bodyp">
+                    <p>Join Koya Nardz to trade, build, or view computers with ease.</p>
+                </div>
+                <a href="{% url 'register' %}">Sign up</a>
+            </div>
+        </div>
+        <div class="loginpage_right">
+            <div class="loginpage_rightbody">
+                <h2>Sign In</h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form_field">
+                        <input type="text" name="username_or_email" placeholder="Username" required>
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    {% if messages %}
+                        <small style="color: #c33; display: block; margin-top: 6px; margin-bottom: 14px;">
+                            {% for message in messages %}
+                                {{ message }}<br>
+                            {% endfor %}
+                        </small>
+                    {% endif %}
+                    <div class="password-wrapper">
+                        <input type="password" name="password" id="password-field" placeholder="Password" required>
+                        <img src="{% static 'images/icon/password-hide.png' %}" class="toggle-password" id="togglePassword" alt="Show Password">
+                    </div>
+                    <a href="{% url 'forgot_password' %}" class="forgot-password-link">Forgot password?</a>
+                    <button type="submit">Sign In</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const passwordField = document.getElementById("password-field");
+    const toggleBtn = document.getElementById("togglePassword");
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener("click", () => {
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                toggleBtn.src = "{% static 'images/icon/password-visible.png' %}";
+            } else {
+                passwordField.type = "password";
+                toggleBtn.src = "{% static 'images/icon/password-hide.png' %}";
+            }
+        });
+    }
+</script>
+
+{% endblock content %}

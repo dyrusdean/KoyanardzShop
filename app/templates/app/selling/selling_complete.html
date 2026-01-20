@@ -1,0 +1,206 @@
+{% extends 'app/navigation.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    /* Mobile responsive styles for selling complete page */
+    @media (max-width: 768px) {
+        .appointment-summary-grid {
+            grid-template-columns: 1fr !important;
+        }
+        
+        .product-info-grid {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+        }
+        
+        .product-details-grid {
+            grid-template-columns: 1fr !important;
+            gap: 15px !important;
+        }
+        
+        .appointment-summary-grid > div {
+            padding: 20px !important;
+        }
+    }
+    
+    @media (max-width: 520px) {
+        .appointment-summary-grid {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+            padding: 20px !important;
+        }
+        
+        .appointment-summary-grid > div {
+            padding: 15px !important;
+            background: white !important;
+            border-radius: 8px !important;
+            border: 1px solid #e0e0e0 !important;
+        }
+        
+        .product-info-grid {
+            grid-template-columns: 1fr !important;
+            gap: 15px !important;
+        }
+        
+        .product-image-container {
+            width: 100% !important;
+            max-width: 200px !important;
+            margin: 0 auto !important;
+        }
+        
+        .product-details-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+        }
+        
+        .complete_button a {
+            display: block !important;
+            width: 100% !important;
+            text-align: center !important;
+        }
+    }
+</style>
+
+<div class="completepage">
+    <div class="uppercomplete">
+        <ul>
+            <li>Trade</li>
+            <p>></p>
+            <li>Personal Information</li>
+            <p>></p>
+            <li>Aggreement</li>
+            <p>></p>
+            <li>Appointment Complete</li>
+        </ul>
+    </div>
+    <div class="complete_body">
+        <div class="completebody_textbody">
+            <div class="completebody_image">
+                <img src="{% static 'images/notification.png' %}" alt="">
+            </div>
+            <div class="completebody_text">
+                <h3>Thank you!</h3>
+                <div class="completebody_bodytext">
+                    <p>Your appointment request for product has been received.</p>
+                    <p>Reference Number: <span>{{ reference_number }}</span></p>
+                    <p>A confirmation email has been sent to your registered email address.</p>
+                    <p>Please note: Your appointment is subject to approval. You will receive another notification once it has been confirmed.</br>
+                        We appreciate your interest and will get back to you shortly.
+                    </p>
+                </div>
+                <div class="complete_button">
+                    <a href="{% url 'my_appointment' %}">Check your Appointment</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if selling_data %}
+    <div style="max-width: 1200px; margin: 40px auto; padding: 20px;">
+        <h2 style="margin-bottom: 30px; text-align: center;">📋 Appointment Summary</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: #f8f9fa; padding: 30px; border-radius: 12px;" class="appointment-summary-grid">
+            <!-- Personal Information -->
+            <div>
+                <h3 style="margin-bottom: 20px; color: #38728F;">👤 Personal Information</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div>
+                        <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">First Name</strong>
+                        <span>{{ selling_data.first_name }}</span>
+                    </div>
+                    <div>
+                        <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Last Name</strong>
+                        <span>{{ selling_data.last_name }}</span>
+                    </div>
+                    <div>
+                        <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Contact</strong>
+                        <span>{{ selling_data.contact }}</span>
+                    </div>
+                    <div>
+                        <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Email</strong>
+                        <span>{{ selling_data.email }}</span>
+                    </div>
+                    <div>
+                        <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Address</strong>
+                        <span>{{ selling_data.address }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointment Details -->
+            <div>
+                <h3 style="margin-bottom: 20px; color: #38728F;">📅 Appointment Details</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div>
+                        <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Appointment Date</strong>
+                        <span>{{ selling_data.selling_date }}</span>
+                    </div>
+                    <div>
+                        <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Appointment Time</strong>
+                        <span>{{ selling_data.selling_time }}</span>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Reference Number</strong>
+                        <span style="font-size: 16px; font-weight: bold; color: #38728F;">{{ reference_number }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Information -->
+        <div style="background: white; padding: 30px; border-radius: 12px; margin-top: 30px; border: 1px solid #e0e0e0;">
+            <h3 style="margin-bottom: 25px; color: #38728F;">📦 Product Information</h3>
+            
+            <div style="display: grid; grid-template-columns: auto 1fr; gap: 30px; align-items: start;" class="product-info-grid">
+                {% if selling_data.image %}
+                <div style="width: 150px; height: 150px; background: #f0f0f0; border-radius: 8px; overflow: hidden; flex-shrink: 0;" class="product-image-container">
+                    <img src="{{ selling_data.image }}" alt="{{ selling_data.product_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                {% else %}
+                <div style="width: 150px; height: 150px; background: #e0e0e0; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span style="color: #999;">No Image</span>
+                </div>
+                {% endif %}
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="product-details-grid">
+                    <div>
+                        <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Product Name</strong>
+                        <span>{{ selling_data.product_name }}</span>
+                    </div>
+                    <div>
+                        <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Category</strong>
+                        <span>{{ selling_data.category }}</span>
+                    </div>
+                    <div>
+                        <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Selling Price</strong>
+                        <span style="font-size: 16px; font-weight: bold; color: #38728F;">₱{{ selling_data.price|floatformat:2 }}</span>
+                    </div>
+                    <div>
+                        <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">&nbsp;</strong>
+                        <span>&nbsp;</span>
+                    </div>
+                </div>
+            </div>
+
+            {% if selling_data.description %}
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <strong style="display: block; color: #666; font-size: 12px; text-transform: uppercase; margin-bottom: 8px;">Description</strong>
+                <p style="color: #333; line-height: 1.6;">{{ selling_data.description }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="{% url 'my_sellingappointment' %}" style="display: inline-block; padding: 12px 30px; background: #38728F; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">View All Selling Appointments</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="complete_bottom">
+
+    </div>
+</div>
+
+{% endblock content %}
