@@ -87,11 +87,155 @@
 <script>
     document.getElementById('download-pdf').addEventListener('click', function() {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        const table = document.querySelector('.products-table');
-        doc.autoTable({ html: table });
-        doc.save('inventory-list.pdf');
+        const doc = new jsPDF('p', 'mm', 'a4');
+        
+        // Logo URL
+        const logoUrl = '{% static "images/LOGO.png" %}';
+        
+        // Convert image to base64 using canvas (for PDF embedding)
+        const img = new Image();
+        img.src = logoUrl;
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const imgData = canvas.toDataURL('image/png');
+            
+            // Add logo to PDF
+            doc.addImage(imgData, 'PNG', 14, 10, 30, 30);
+            
+            // Add title and company info
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text('KOYANARDZ SHOP', 50, 25);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Product Inventory List', 50, 32);
+            doc.text('341 Molino Road, Bacoor, Cavite', 50, 38);
+            
+            // Add date and prepared by
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'italic');
+            doc.text(`Automatically Prepared By: Inventory System`, 14, 50);
+            doc.text(`Date: ${dateStr}`, 14, 56);
+            
+            // Get table data
+            const table = document.querySelector('.products-table');
+            const rows = [];
+            const headers = [];
+            
+            // Extract headers
+            const headerCells = table.querySelectorAll('thead th');
+            headerCells.forEach(cell => {
+                headers.push(cell.textContent.trim());
+            });
+            
+            // Extract body data
+            const bodyCells = table.querySelectorAll('tbody tr');
+            bodyCells.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 0) {
+                    const rowData = [];
+                    cells.forEach((cell, index) => {
+                        let text = cell.textContent.trim();
+                        // Format price column (index 4) with proper peso sign
+                        if (index === 4) {
+                            // Remove any existing peso or special characters
+                            text = text.replace(/[₱±]/g, '').trim();
+                            text = 'P ' + text;
+                        }
+                        rowData.push(text);
+                    });
+                    rows.push(rowData);
+                }
+            });
+            
+            // Add table to PDF
+            doc.autoTable({
+                head: [headers],
+                body: rows,
+                startY: 62,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [102, 126, 234],
+                    textColor: 255,
+                    fontStyle: 'bold',
+                    fontSize: 11,
+                    halign: 'center',
+                    padding: 3
+                },
+                bodyStyles: {
+                    fontSize: 9,
+                    textColor: 50,
+                    padding: 3
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 247, 250]
+                },
+                columnStyles: {
+                    0: { halign: 'center', cellWidth: 12 },
+                    1: { halign: 'left', cellWidth: 65 },
+                    2: { halign: 'center', cellWidth: 30 },
+                    3: { halign: 'center', cellWidth: 18 },
+                    4: { halign: 'right', cellWidth: 40 }
+                },
+                margin: { left: 14, right: 14 },
+                didDrawPage: function(data) {
+                    // Footer
+                    const pageSize = doc.internal.pageSize;
+                    const pageHeight = pageSize.getHeight();
+                    doc.setFontSize(8);
+                    doc.setFont(undefined, 'normal');
+                    doc.text('Koyanardz Shop - Confidential', 14, pageHeight - 10);
+                    doc.text(`Page ${data.pageNumber}`, pageSize.getWidth() - 30, pageHeight - 10);
+                }
+            });
+            
+            // Add summary at the bottom
+            const finalY = doc.lastAutoTable.finalY + 10;
+            const totalProducts = bodyCells.length;
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Total Products: ${totalProducts}`, 14, finalY);
+            
+            // Save the PDF
+            doc.save('Koyanardz_Inventory_' + today.getTime() + '.pdf');
+        };
+        
+        // Handle image load error
+        img.onerror = function() {
+            console.warn('Logo image failed to load, generating PDF without logo');
+            // Generate PDF without logo if image fails to load
+            const doc2 = new jsPDF('p', 'mm', 'a4');
+            
+            doc2.setFontSize(16);
+            doc2.setFont(undefined, 'bold');
+            doc2.text('KOYANARDZ SHOP', 14, 20);
+            
+            doc2.setFontSize(10);
+            doc2.setFont(undefined, 'normal');
+            doc2.text('Product Inventory List', 14, 28);
+            doc2.text('341 Molino Road, Bacoor, Cavite', 14, 34);
+            
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            doc2.setFontSize(9);
+            doc2.setFont(undefined, 'italic');
+            doc2.text(`Automatically Prepared By: Inventory System`, 14, 44);
+            doc2.text(`Date: ${dateStr}`, 14, 50);
+            
+            const table = document.querySelector('.products-table');
+            doc2.autoTable({ html: table, startY: 56 });
+            doc2.save('Koyanardz_Inventory_' + today.getTime() + '.pdf');
+        };
     });
 </script>
 {% endblock content %}

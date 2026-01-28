@@ -80,6 +80,32 @@
                     </div>
                 </div>
 
+                <!-- Item Condition Filter -->
+                <div class="filter-section">
+                    <label class="filter-label">✨ Condition</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #333; font-weight: 500;">
+                            <input type="checkbox" name="condition" value="brand_new" class="condition-checkbox" style="width: 16px; height: 16px; cursor: pointer; accent-color: #667eea;">
+                            <span>🆕 Brand New</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #333; font-weight: 500;">
+                            <input type="checkbox" name="condition" value="second_hand" class="condition-checkbox" style="width: 16px; height: 16px; cursor: pointer; accent-color: #667eea;">
+                            <span>♻️ Second-hand</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Most Purchased Filter -->
+                <div class="filter-section">
+                    <label class="filter-label">⭐ Popularity</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #333; font-weight: 500;">
+                            <input type="checkbox" name="popularity" value="most_purchased" class="popularity-checkbox" style="width: 16px; height: 16px; cursor: pointer; accent-color: #667eea;">
+                            <span>🔥 Most Purchased</span>
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Apply Filters Button -->
                 <div class="filter-actions">
                     <button type="submit" class="filter-apply-btn">✓ Apply Filters</button>
@@ -174,7 +200,7 @@
 <div id="custom-chat-widget" class="custom-chat-widget hidden">
     <div class="custom-chat-header">
         <div class="custom-chat-header-content">
-            <h3 class="custom-chat-title">💬 Chat Assistant</h3>
+            <h3 class="custom-chat-title">🤖 Koya AI</h3>
             <p class="custom-chat-subtitle">Ask us anything!</p>
         </div>
         <div class="custom-chat-header-actions">
@@ -1559,7 +1585,7 @@ Always be warm, helpful, and encourage customers to visit in person. Support bot
                                             `<button class="product-select-btn" data-product-id="${product.id}" data-category="${categoryId}" type="button" style="flex: 1; padding: 4px 6px; background: #28a745; color: white; border: none; border-radius: 3px; font-size: 11px; cursor: pointer; font-weight: 600; pointer-events: auto !important; touch-action: auto; -webkit-user-select: none; user-select: none; z-index: 10 !important; position: relative;">Select</button>` :
                                             `<button class="product-details-btn" data-product-id="${product.id}" type="button" style="flex: 1; padding: 4px 6px; background: #667eea; color: white; border: none; border-radius: 3px; font-size: 11px; cursor: pointer; pointer-events: auto !important; touch-action: auto; -webkit-user-select: none; user-select: none; z-index: 10 !important; position: relative;">Details</button>`
                                         }
-                                        ${product.model_3d ? `<button class="product-3d-ask-btn" data-product-id="${product.id}" data-product-name="${product.name}" data-model-url="${product.model_3d}" type="button" style="flex: 1; padding: 4px 6px; background: #764ba2; color: white; border: none; border-radius: 3px; font-size: 11px; cursor: pointer; pointer-events: auto !important; touch-action: auto; -webkit-user-select: none; user-select: none; z-index: 10 !important; position: relative;">3D?</button>` : ''}
+                                        ${product.model_3d ? `<button class="product-3d-ask-btn" data-product-id="${product.id}" data-product-name="${product.name}" data-model-url="${product.model_3d}" type="button" style="flex: 1; padding: 4px 6px; background: #764ba2; color: white; border: none; border-radius: 3px; font-size: 11px; cursor: pointer; pointer-events: auto !important; touch-action: auto; -webkit-user-select: none; user-select: none; z-index: 10 !important; position: relative;">3D</button>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -1660,6 +1686,15 @@ Always be warm, helpful, and encourage customers to visit in person. Support bot
             askDiv.querySelector('.close-3d-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
                 askDiv.remove();
+                // Remove the 3D model div that was created by show3DModelInChat
+                const all3DModels = container.querySelectorAll('.custom-chat-message.bot-message');
+                for (let div of all3DModels) {
+                    const p = div.querySelector('p');
+                    if (p && p.textContent && p.textContent.includes('3D Model')) {
+                        div.remove();
+                        break;
+                    }
+                }
                 // User must go back and select or skip the component
                 // Don't proceed to next component
             });
@@ -4411,6 +4446,8 @@ Always be warm, helpful, and encourage customers to visit in person. Support bot
             const brandItems = document.querySelectorAll('.brand-item');
             const clearBrandFilter = document.getElementById('clearBrandFilter');
             const resetFiltersBtn = document.getElementById('resetFilters');
+            const conditionCheckboxes = document.querySelectorAll('.condition-checkbox');
+            const popularityCheckboxes = document.querySelectorAll('.popularity-checkbox');
 
             // Open filter panel
             if (filterBtn && filterPanel) {
@@ -4453,6 +4490,20 @@ Always be warm, helpful, and encourage customers to visit in person. Support bot
                     }
                 });
             }
+
+            // Condition checkbox handler
+            conditionCheckboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    mainFilterForm.submit();
+                });
+            });
+
+            // Popularity checkbox handler
+            popularityCheckboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    mainFilterForm.submit();
+                });
+            });
 
             // Brand item selection
             brandItems.forEach(function(item) {
@@ -4509,9 +4560,16 @@ Always be warm, helpful, and encourage customers to visit in person. Support bot
                         const checkbox = item.querySelector('.brand-checkbox');
                         if (checkbox) checkbox.checked = false;
                     });
+                    conditionCheckboxes.forEach(function(checkbox) {
+                        checkbox.checked = false;
+                    });
+                    popularityCheckboxes.forEach(function(checkbox) {
+                        checkbox.checked = false;
+                    });
                     const hiddenInput = mainFilterForm.querySelector('input[name="brand"]');
                     if (hiddenInput) hiddenInput.remove();
                     if (clearBrandFilter) clearBrandFilter.style.display = 'none';
+                    mainFilterForm.submit();
                 });
             }
 
@@ -5244,21 +5302,24 @@ Always be warm, helpful, and encourage customers to visit in person. Support bot
     }
 
     .custom-chat-messages::-webkit-scrollbar {
-        width: 8px;
+        width: 10px;
     }
 
     .custom-chat-messages::-webkit-scrollbar-track {
         background: #f1f1f1;
         border-radius: 4px;
+        margin: 5px 0;
     }
 
     .custom-chat-messages::-webkit-scrollbar-thumb {
-        background: #c0c0c0;
-        border-radius: 4px;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        border-radius: 5px;
+        border: 2px solid #f1f1f1;
     }
 
     .custom-chat-messages::-webkit-scrollbar-thumb:hover {
-        background: #a0a0a0;
+        background: linear-gradient(180deg, #764ba2 0%, #667eea 100%);
+        box-shadow: 0 0 6px rgba(102, 126, 234, 0.4);
     }
 
     .custom-chat-message {

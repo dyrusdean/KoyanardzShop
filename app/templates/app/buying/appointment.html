@@ -207,11 +207,19 @@
         max-width: 1400px;
         margin: 0 auto;
         box-sizing: border-box;
-        gap: 150px;
+        gap: 8px;
         align-items: start;
     }
 
-    /* Calendar Section */
+    /* Left Column - Product + Form */
+    .appointment_left_column {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        width: 100%;
+    }
+
+    /* Calendar Section (Right) */
     .appointment_body .appointment_left {
         width: 100%;
         font-family: Montserrat;
@@ -222,6 +230,7 @@
         display: flex;
         flex-direction: column;
         gap: 15px;
+        height: 100%;
     }
 
     .appointment_body .appointment_left p {
@@ -276,17 +285,17 @@
         max-width: 100%;
         overflow: visible;
         background: white;
-        padding: 28px;
+        padding: 18px;
         border-radius: 16px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     .appointment_body .appointment_right p {
         padding: 0;
-        font-size: 1.3rem;
+        font-size: 1.15rem;
         color: #001A40;
         font-weight: 700;
-        margin-bottom: 22px;
+        margin-bottom: 14px;
     }
 
     .appointment_body .appointment_right img {
@@ -311,14 +320,14 @@
     .apppointment_rightform {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 16px;
+        gap: 10px;
+        margin-bottom: 12px;
         width: 100%;
     }
 
     .apppointment_rightform i {
         flex-shrink: 0;
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         color: #38728F;
     }
 
@@ -338,12 +347,12 @@
     .appointment_body .appointment_right form p input {
         width: 100%;
         max-width: 100%;
-        height: 44px;
-        padding: 10px 14px;
+        height: 38px;
+        padding: 8px 12px;
         margin: 0;
-        font-size: 1rem;
+        font-size: 0.95rem;
         border: 2px solid #e0e0e0;
-        border-radius: 8px;
+        border-radius: 6px;
         background-color: #f8f9fa;
         box-sizing: border-box;
         font-family: Montserrat;
@@ -389,12 +398,12 @@
     .apppointmentright_formbutton {
         width: 100%;
         max-width: 100%;
-        margin: 24px 0 0 0;
-        padding: 14px 28px;
-        font-size: 1.05rem;
+        margin: 14px 0 0 0;
+        padding: 11px 24px;
+        font-size: 0.95rem;
         font-weight: 700;
         border: none;
-        border-radius: 8px;
+        border-radius: 6px;
         color: white;
         background: linear-gradient(135deg, #38728F 0%, #2a5276 100%);
         cursor: pointer;
@@ -420,6 +429,14 @@
             gap: 30px;
         }
 
+        .appointment_left_column {
+            order: 2;
+        }
+
+        .appointment_left {
+            order: 1;
+        }
+
         .appointment_product_content {
             grid-template-columns: 1fr;
         }
@@ -441,15 +458,6 @@
         .appointment_body h3 {
             font-size: 2rem;
             padding: 1.5rem 1rem 0.5rem;
-        }
-
-        .appointment_product_info_section {
-            padding: 0 1rem;
-            margin-bottom: 25px;
-        }
-
-        .appointment_product_card {
-            padding: 18px;
         }
 
         .appointment_bodybody {
@@ -520,75 +528,80 @@
     <div class="appointment_body">
         <h3>Make an Appointment</h3>
         
-        {% if product_info %}
-        <div class="appointment_product_info_section">
-            <div class="appointment_product_card">
-                <div class="appointment_product_header">
-                    <h4>📦 Product Details</h4>
+        <div class="appointment_bodybody">
+            <!-- Left Column: Product Details + Form -->
+            <div class="appointment_left_column">
+                <!-- Product Details Section -->
+                {% if product_info %}
+                <div class="appointment_product_card">
+                    <div class="appointment_product_header">
+                        <h4>📦 Product Details</h4>
+                    </div>
+                    <div class="appointment_product_content">
+                        {% if product_info.image %}
+                        <div class="appointment_product_image">
+                            <img src="{{ product_info.image }}" alt="{{ product_info.product_name }}">
+                        </div>
+                        {% endif %}
+                        <div class="appointment_product_details">
+                            <div class="appointment_product_detail_item">
+                                <strong>Product Name</strong>
+                                <span>{{ product_info.product_name }}</span>
+                            </div>
+                            <div class="appointment_product_detail_item">
+                                <strong>Unit Price</strong>
+                                <span>₱{{ product_info.price|floatformat:2 }}</span>
+                            </div>
+                            <div class="appointment_product_detail_item">
+                                <strong>Quantity</strong>
+                                <span>{{ product_info.quantity }}</span>
+                            </div>
+                            <div class="appointment_product_detail_item total">
+                                <strong>Total Amount</strong>
+                                <span>₱{{ product_info.total_price|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="appointment_product_content">
-                    {% if product_info.image %}
-                    <div class="appointment_product_image">
-                        <img src="{{ product_info.image }}" alt="{{ product_info.product_name }}">
-                    </div>
-                    {% endif %}
-                    <div class="appointment_product_details">
-                        <div class="appointment_product_detail_item">
-                            <strong>Product Name</strong>
-                            <span>{{ product_info.product_name }}</span>
+                {% endif %}
+
+                <!-- Form Section -->
+                <div class="appointment_right">
+                    <p><i class="fas fa-user"></i> Your Information</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="apppointment_rightform">
+                            <i class="fas fa-user-circle"></i><p>{{ form.first_name }}</p>
+                            <p>{{ form.last_name }}</p>
                         </div>
-                        <div class="appointment_product_detail_item">
-                            <strong>Unit Price</strong>
-                            <span>₱{{ product_info.price|floatformat:2 }}</span>
+                        <div class="apppointment_rightform">
+                        <i class="fas fa-phone"></i><p>{{ form.contact }}</p>
                         </div>
-                        <div class="appointment_product_detail_item">
-                            <strong>Quantity</strong>
-                            <span>{{ product_info.quantity }}</span>
+                        <div class="apppointment_rightform">
+                        <i class="fas fa-envelope"></i><p>{{ form.email }}</p>
                         </div>
-                        <div class="appointment_product_detail_item total">
-                            <strong>Total Amount</strong>
-                            <span>₱{{ product_info.total_price|floatformat:2 }}</span>
+
+                        {{ form.date.as_hidden }}
+                        {{ form.time.as_hidden }}
+
+                        <div class="apppointment_rightform">
+                            <i class="fas fa-clock"></i>
+                            <select id="id_time_select" disabled style="flex: 1; height: 44px; padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 8px; background-color: #f8f9fa; font-size: 1rem; font-family: Montserrat; cursor: pointer; transition: all 0.3s ease;">
+                                <option value="">Select Time</option>
+                            </select>
                         </div>
-                    </div>
+
+                        <button class="apppointmentright_formbutton" type="submit">Proceed to Checkout</button>
+                    </form>
                 </div>
             </div>
-        </div>
-        {% endif %}
-        
-        <div class="appointment_bodybody">
+
+            <!-- Right Column: Calendar -->
             <div class="appointment_left">
                 <p>Select Date:</p>
                 <div id="appointment-calendar">
 
                 </div>
-            </div>
-            <div class="appointment_right">
-                <p><i class="fas fa-user"></i> Your Information</p>
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="apppointment_rightform">
-                        <i class="fas fa-user-circle"></i><p>{{ form.first_name }}</p>
-                        <p>{{ form.last_name }}</p>
-                    </div>
-                    <div class="apppointment_rightform">
-                    <i class="fas fa-phone"></i><p>{{ form.contact }}</p>
-                    </div>
-                    <div class="apppointment_rightform">
-                    <i class="fas fa-envelope"></i><p>{{ form.email }}</p>
-                    </div>
-
-                    {{ form.date.as_hidden }}
-                    {{ form.time.as_hidden }}
-
-                    <div class="apppointment_rightform">
-                        <i class="fas fa-clock"></i>
-                        <select id="id_time_select" disabled style="flex: 1; height: 44px; padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 8px; background-color: #f8f9fa; font-size: 1rem; font-family: Montserrat; cursor: pointer; transition: all 0.3s ease;">
-                            <option value="">Select Time</option>
-                        </select>
-                    </div>
-
-                    <button class="apppointmentright_formbutton" type="submit">Proceed to Checkout</button>
-                </form>
             </div>
         </div>
     </div>

@@ -42,13 +42,14 @@ class RegisterForm(UserCreationForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "First Name", "class": "form-control"}))
     last_name = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Last Name", "class": "form-control"}))
     email = forms.CharField(widget=forms.EmailInput(attrs={"placeholder": "Email Address", "class": "form-control"}))
+    contact = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Mobile Number", "class": "form-control"}), required=True)
     username = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Username", "class": "form-control"}))
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput(attrs={"placeholder": "Enter password", "class": "form-control"}))
     password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput(attrs={"placeholder": "Confirm password", "class": "form-control"}))
 
     class Meta:
         model = get_user_model()
-        fields = ["first_name", "last_name", "email", "username", "password1", "password2"]
+        fields = ["first_name", "last_name", "email", "contact", "username", "password1", "password2"]
     
     def clean_email(self):
         email = self.cleaned_data.get('email')

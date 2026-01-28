@@ -1519,6 +1519,7 @@ def appoint(request):
             'first_name': request.user.first_name,
             'last_name': request.user.last_name,
             'email': request.user.email,
+            'contact': request.user.contact,
         }
         form = AppointmentForm(initial=initial_data)
 
@@ -1732,6 +1733,8 @@ class ProductPage(TemplateView):
         category_filter = self.request.GET.get('category', '').strip()
         brand_filter = self.request.GET.get('brand', '').strip()
         price_order = self.request.GET.get('price_order', '').strip()
+        condition_filters = self.request.GET.getlist('condition')
+        popularity_filters = self.request.GET.getlist('popularity')
 
         products = Product.objects.all()
 
@@ -1776,10 +1779,32 @@ class ProductPage(TemplateView):
             except (ValueError, TypeError):
                 pass
 
+        # Filter by condition (brand new / second-hand)
+        if condition_filters:
+            condition_q = Q()
+            if 'brand_new' in condition_filters:
+                # Brand new items: category name is NOT '2nd Hand'
+                condition_q |= ~Q(category_name__category_name__icontains='2nd Hand')
+            if 'second_hand' in condition_filters:
+                # Second hand items: category name is '2nd Hand'
+                condition_q |= Q(category_name__category_name__icontains='2nd Hand')
+            
+            if condition_q:
+                products = products.filter(condition_q)
+
         # Always annotate total_bought for all products to show best seller tag
         products = products.annotate(
             total_bought=Sum('appointmentproduct__quantity')
         )
+
+        # Filter by popularity (most purchased)
+        if 'most_purchased' in popularity_filters:
+            # Get top 20% best-selling products
+            from django.db.models import Q as DjangoQ
+            products = products.filter(total_bought__gt=0).order_by('-total_bought')[:int(len(products) * 0.2) or 1]
+            products = Product.objects.filter(pk__in=[p.pk for p in products]).annotate(
+                total_bought=Sum('appointmentproduct__quantity')
+            )
 
         if price_order == 'high':
             products = products.order_by('-price')
@@ -2177,7 +2202,7 @@ class SellingPage(TemplateView):
                 'first_name': self.request.user.first_name,
                 'last_name': self.request.user.last_name,
                 'email': self.request.user.email,
-                'contact': self.request.user.phone_number if hasattr(self.request.user, 'phone_number') else '',
+                'contact': self.request.user.contact,
                 'address': self.request.user.address if hasattr(self.request.user, 'address') else '',
             }
         

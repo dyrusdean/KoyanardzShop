@@ -68,6 +68,12 @@
         
         console.log('Elements found in startOTPCountdown:', { otpInput, resendBtn, cooldownDisplay, otpTimerDisplay });
         
+        // If otp timer display not found, we can't start the timer
+        if (!otpTimerDisplay) {
+            console.error('OTP timer element not found!');
+            return false;
+        }
+        
         // OTP input formatting - allow numbers and letters (for hex codes)
         if (otpInput) {
             otpInput.addEventListener('input', function() {
@@ -90,7 +96,8 @@
         }
 
         const otpCountdown = setInterval(() => {
-            if (!otpTimerDisplay) {
+            const otpTimer = document.getElementById('otp-timer');
+            if (!otpTimer) {
                 clearInterval(otpCountdown);
                 return;
             }
@@ -99,15 +106,27 @@
 
             if (distance <= 0) {
                 clearInterval(otpCountdown);
-                otpTimerDisplay.textContent = '⚠ OTP expired. Please request a new code.';
+                otpTimer.textContent = '⚠ OTP expired. Please request a new code.';
+                otpTimer.style.color = '#c33';
                 localStorage.removeItem('otpExpiresAt');
                 return;
             }
 
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            otpTimerDisplay.textContent = `OTP expires in ${minutes}m ${seconds}s`;
+            otpTimer.textContent = `⏱ OTP expires in ${minutes}m ${seconds}s`;
+            otpTimer.style.color = '#003d99';
         }, 1000);
+        
+        // Force immediate display update
+        const now = new Date().getTime();
+        const initialDistance = otpExpiresAt - now;
+        if (initialDistance > 0) {
+            const minutes = Math.floor((initialDistance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((initialDistance % (1000 * 60)) / 1000);
+            otpTimerDisplay.textContent = `⏱ OTP expires in ${minutes}m ${seconds}s`;
+            otpTimerDisplay.style.color = '#003d99';
+        }
 
         // Resend cooldown (1 minute from first attempt)
         if (!resendCooldownEnd) {
@@ -126,29 +145,44 @@
             resendBtn.style.cursor = 'not-allowed';
         }
         
+        // Force initial update for cooldown display
+        const cooldownNow = new Date().getTime();
+        const cooldownInitialDistance = resendCooldownEnd - cooldownNow;
+        if (cooldownDisplay && cooldownInitialDistance > 0) {
+            const initialSeconds = Math.ceil(cooldownInitialDistance / 1000);
+            cooldownDisplay.textContent = `You can resend in ${initialSeconds}s`;
+            cooldownDisplay.style.display = 'block';
+        }
+        
         const countdown = setInterval(() => {
+            const cooldownEl = document.getElementById('resend-cooldown');
+            const resendBtnEl = document.getElementById('resend-btn');
             const now = new Date().getTime();
             const resendDistance = resendCooldownEnd - now;
             
             // Resend Cooldown Timer
             if (resendDistance > 0) {
-                const resendSeconds = Math.floor(resendDistance / 1000);
-                if (cooldownDisplay) {
-                    cooldownDisplay.textContent = `You can resend in ${resendSeconds}s`;
+                const resendSeconds = Math.ceil(resendDistance / 1000);
+                if (cooldownEl) {
+                    cooldownEl.textContent = `You can resend in ${resendSeconds}s`;
+                    cooldownEl.style.display = 'block';
                 }
             } else {
                 clearInterval(countdown);
-                if (cooldownDisplay) {
-                    cooldownDisplay.textContent = 'Ready to resend';
+                if (cooldownEl) {
+                    cooldownEl.textContent = 'Ready to resend';
+                    cooldownEl.style.display = 'block';
                 }
-                if (resendBtn) {
-                    resendBtn.disabled = false;
-                    resendBtn.style.opacity = '1';
-                    resendBtn.style.cursor = 'pointer';
+                if (resendBtnEl) {
+                    resendBtnEl.disabled = false;
+                    resendBtnEl.style.opacity = '1';
+                    resendBtnEl.style.cursor = 'pointer';
                 }
                 localStorage.removeItem('resendCooldownEnd');
             }
         }, 1000);
+        
+        return true;
     }
 
     function handleResendClick(e) {
@@ -417,7 +451,8 @@
         
         if (otpTimer) {
             console.log('OTP timer element found, starting countdown...');
-            startOTPCountdown();
+            const result = startOTPCountdown();
+            console.log('startOTPCountdown result:', result);
             return true;
         }
         return false;
@@ -434,18 +469,28 @@
             console.log('OTP countdown initialized successfully');
         }
         
-        if (initAttempts >= 10) {
+        if (initAttempts >= 20) {
             clearInterval(initInterval);
-            console.warn('Could not find OTP timer element after 10 attempts');
+            console.warn('Could not find OTP timer element after 20 attempts');
         }
     }, 100);
 
     // Also try immediately on DOMContentLoaded
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeOTPCountdown);
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOMContentLoaded fired, attempting to initialize OTP');
+            initializeOTPCountdown();
+        });
     } else {
-        setTimeout(initializeOTPCountdown, 100);
+        console.log('DOM already loaded, attempting to initialize OTP immediately');
+        setTimeout(initializeOTPCountdown, 50);
     }
+    
+    // One more aggressive attempt after a short delay
+    setTimeout(() => {
+        console.log('Final attempt to initialize OTP timer');
+        initializeOTPCountdown();
+    }, 500);
 </script>
 
 <style>
@@ -893,9 +938,16 @@
     
     .resend-cooldown-text {
         margin-top: 8px;
-        font-size: 0.8rem;
-        color: #555;
+        margin-bottom: 12px;
+        padding: 8px 10px;
+        font-size: 0.85rem;
+        color: #666;
         text-align: center;
+        background: #f5f5f5;
+        border-radius: 4px;
+        display: block !important;
+        min-height: 18px;
+        visibility: visible !important;
     }
     
     /* Mobile Responsive - OTP + resend layout */
@@ -1272,6 +1324,18 @@
                                 <div class="form_field">
                                     {{ field }}
                                     <i class="fa-solid fa-envelope"></i>
+                                    {% if field.errors %}
+                                        <small>
+                                            {% for error in field.errors %}
+                                                {{ error }}<br>
+                                            {% endfor %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            {% elif field.name == 'contact' %}
+                                <div class="form_field">
+                                    {{ field }}
+                                    <i class="fa-solid fa-phone"></i>
                                     {% if field.errors %}
                                         <small>
                                             {% for error in field.errors %}
