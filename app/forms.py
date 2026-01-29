@@ -42,7 +42,7 @@ class RegisterForm(UserCreationForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "First Name", "class": "form-control"}))
     last_name = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Last Name", "class": "form-control"}))
     email = forms.CharField(widget=forms.EmailInput(attrs={"placeholder": "Email Address", "class": "form-control"}))
-    contact = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Mobile Number", "class": "form-control"}), required=True)
+    contact = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Mobile Number", "class": "form-control", "type": "tel", "pattern": "[0-9]*", "inputmode": "numeric", "maxlength": "15"}), required=True)
     username = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Username", "class": "form-control"}))
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput(attrs={"placeholder": "Enter password", "class": "form-control"}))
     password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput(attrs={"placeholder": "Confirm password", "class": "form-control"}))
@@ -179,7 +179,7 @@ class AppointmentForm(forms.ModelForm):
         widgets = {
             'first_name': forms.TextInput(attrs={'placeholder': 'First Name'}),
             'last_name': forms.TextInput(attrs={'placeholder': 'Last Name'}),
-            'contact': forms.TextInput(attrs={'placeholder': 'Contact No.'}),
+            'contact': forms.TextInput(attrs={'placeholder': 'Contact No.', 'type': 'tel', 'pattern': '[0-9]*', 'inputmode': 'numeric', 'maxlength': '15'}),
             'email': forms.EmailInput(attrs={'placeholder': 'Email'}),
             'date': forms.DateInput(
                 attrs={

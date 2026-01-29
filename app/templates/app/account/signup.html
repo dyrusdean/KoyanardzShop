@@ -1344,6 +1344,30 @@
                                         </small>
                                     {% endif %}
                                 </div>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        const contactInput = document.querySelector('input[name="contact"]');
+                                        if (contactInput) {
+                                            contactInput.type = 'tel';
+                                            contactInput.pattern = '[0-9]*';
+                                            contactInput.inputMode = 'numeric';
+                                            contactInput.maxLength = '15';
+                                            
+                                            // Prevent non-numeric input
+                                            contactInput.addEventListener('input', function(e) {
+                                                this.value = this.value.replace(/[^0-9]/g, '');
+                                            });
+                                            
+                                            // Prevent non-numeric paste
+                                            contactInput.addEventListener('paste', function(e) {
+                                                e.preventDefault();
+                                                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                                                const numericOnly = pastedText.replace(/[^0-9]/g, '');
+                                                this.value = numericOnly;
+                                            });
+                                        }
+                                    });
+                                </script>
                             {% elif field.name == 'username' %}
                                 <div class="form_field">
                                     {{ field }}
