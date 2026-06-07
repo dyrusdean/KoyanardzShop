@@ -2138,8 +2138,6 @@ class AppointmentCompletePage(TemplateView):
                         product.save()
                 except Exception:
                     # If stock decrement fails for any reason, log and continue
-                    import logging
-                    logger = logging.getLogger(__name__)
                     logger.exception(f"Failed to decrement stock for product in appointment {appointment.id}")
 
                 display_name = product.product_name
@@ -2178,7 +2176,6 @@ class AppointmentCompletePage(TemplateView):
                 recipient_list=[appointment.email],
             )
         except Exception:
-            logger = logging.getLogger(__name__)
             logger.exception(f"Failed to send appointment confirmation email for appointment {appointment.id}")
             
         del request.session['appointment_data']

@@ -608,6 +608,23 @@
                         {{ form.date.as_hidden }}
                         {{ form.time.as_hidden }}
 
+                        <!-- Display form errors if any -->
+                        {% if form.non_field_errors %}
+                            <div style="background-color: #fee; color: #c33; padding: 12px; border-radius: 6px; border-left: 3px solid #c33; margin-bottom: 16px; font-size: 0.9rem;">
+                                {% for error in form.non_field_errors %}
+                                    <p style="margin: 4px 0;">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        {% if form.date.errors %}
+                            <div style="background-color: #fee; color: #c33; padding: 12px; border-radius: 6px; border-left: 3px solid #c33; margin-bottom: 16px; font-size: 0.9rem;">
+                                {% for error in form.date.errors %}
+                                    <p style="margin: 4px 0;">Date: {{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
                         <div class="apppointment_rightform">
                             <i class="fas fa-clock"></i>
                             <select id="id_time_select" disabled style="flex: 1; height: 44px; padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 8px; background-color: #f8f9fa; font-size: 1rem; font-family: Montserrat; cursor: pointer; transition: all 0.3s ease;">
@@ -615,7 +632,7 @@
                             </select>
                         </div>
 
-                        <button class="apppointmentright_formbutton" type="submit">Proceed to Checkout</button>
+                        <button class="apppointmentright_formbutton" type="submit" id="submit-btn" disabled style="opacity: 0.6; cursor: not-allowed;">Proceed to Checkout</button>
                     </form>
                 </div>
             </div>
@@ -641,15 +658,55 @@
         return `${h}:${m} ${am}`;
     }
 
+    // Update submit button state based on form validation
+    function updateSubmitButton() {
+        const hiddenDate = document.getElementById("id_date");
+        const hiddenTime = document.getElementById("id_time");
+        const submitBtn = document.getElementById("submit-btn");
+        
+        const hasDate = hiddenDate && hiddenDate.value;
+        const hasTime = hiddenTime && hiddenTime.value;
+        
+        if (hasDate && hasTime) {
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = "1";
+            submitBtn.style.cursor = "pointer";
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = "0.6";
+            submitBtn.style.cursor = "not-allowed";
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         // Get DOM elements
         const timeSelect = document.getElementById("id_time_select");
         const hiddenTime = document.getElementById("id_time");
+        const submitBtn = document.getElementById("submit-btn");
         
         // Handle time selection
         timeSelect.addEventListener("change", function() {
-            hiddenTime.value = this.value;
+            if (this.value) {
+                hiddenTime.value = this.value;
+                updateSubmitButton();
+                console.log("Time selected:", this.value);
+            }
         });
+
+        // Form submission validation
+        const form = document.querySelector('form[method="POST"]');
+        if (form) {
+            form.addEventListener("submit", function(e) {
+                const hiddenDate = document.getElementById("id_date");
+                const hiddenTime = document.getElementById("id_time");
+                
+                if (!hiddenDate.value || !hiddenTime.value) {
+                    e.preventDefault();
+                    alert("Please select both a date and time before proceeding.");
+                    return false;
+                }
+            });
+        }
 
         // Initialize calendar
         const calendarEl = document.getElementById('appointment-calendar');
@@ -694,32 +751,47 @@
                     }
                 });
                 calendar.render();
+            })
+            .catch(err => {
+                console.error("Error loading booked dates:", err);
             });
+
+        // Initial button state check
+        updateSubmitButton();
     });
 
     // Load available times for selected date
     function loadTimes(date) {
         const timeSelect = document.getElementById("id_time_select");
         const hiddenDate = document.getElementById("id_date");
+        const hiddenTime = document.getElementById("id_time");
         
+        console.log("Loading times for date:", date);
+        
+        // Set the hidden date field
         hiddenDate.value = date;
+        // Clear the time since date changed
+        hiddenTime.value = "";
 
         fetch(`/get-available-times/?date=${date}`)
             .then(res => res.json())
             .then(data => {
                 const available = data.available_times;
                 
+                console.log("Available times:", available);
+                
                 // Clear existing options
                 timeSelect.innerHTML = '<option value="">Select Time</option>';
                 
-                // Enable the select
-                timeSelect.disabled = false;
-
                 if (available.length === 0) {
                     timeSelect.innerHTML = '<option value="">No available times</option>';
                     timeSelect.disabled = true;
+                    updateSubmitButton();
                     return;
                 }
+
+                // Enable the select
+                timeSelect.disabled = false;
 
                 // Add available times to select
                 available.forEach(t => {
@@ -729,16 +801,21 @@
                     timeSelect.appendChild(option);
                 });
                 
-                // Set first option as selected
+                // Auto-select first available time and update hidden field
                 if (available.length > 0) {
                     timeSelect.value = available[0];
-                    document.getElementById("id_time").value = available[0];
+                    hiddenTime.value = available[0];
+                    console.log("Auto-selected first time:", available[0]);
                 }
+                
+                // Update button state
+                updateSubmitButton();
             })
             .catch(err => {
                 console.error("Error loading times:", err);
                 timeSelect.innerHTML = '<option value="">Error loading times</option>';
                 timeSelect.disabled = true;
+                updateSubmitButton();
             });
     }
 </script>

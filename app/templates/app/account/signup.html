@@ -953,22 +953,25 @@
     /* Mobile Responsive - OTP + resend layout */
     @media (max-width: 768px) {
         .signuppage {
-            padding: 24px 12px;
+            padding: 20px 12px;
             align-items: flex-start;
+            min-height: auto;
         }
 
         .signup_body {
             flex-direction: column;
             width: 100%;
-            max-width: 420px;
+            max-width: 100%;
             margin: 0 auto;
-            border-radius: 14px;
+            border-radius: 12px;
+            min-height: auto !important;
         }
 
         .signup_left,
         .signup_right {
-            padding: 28px 20px;
+            padding: 24px 18px;
             min-height: auto !important;
+            flex-basis: auto;
         }
 
         .signup_leftbody h2 {
@@ -1175,11 +1178,12 @@
         .signup_body {
             flex-direction: column;
             width: 95%;
+            min-height: auto !important;
         }
         
         .signup_left, .signup_right {
-            padding: 36px 24px;
-            min-height: 650px;
+            padding: 28px 20px;
+            min-height: auto !important;
         }
         
         .signup_leftbody h2 {
@@ -1228,8 +1232,8 @@
         }
         
         .signup_left, .signup_right {
-            padding: 24px 16px;
-            min-height: auto;
+            padding: 20px 14px;
+            min-height: auto !important;
         }
         
         .signup_leftbody h2 {
